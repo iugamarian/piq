@@ -10,7 +10,7 @@ int main(void)
 
     /* setup */
     retval = bcm2835_init();
-    if (retval) {
+    if (retval == 0) {
         printf("%s\n", I2C_INIT_FAILED);
         return -1;
     }
