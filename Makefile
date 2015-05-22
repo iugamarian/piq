@@ -1,4 +1,27 @@
-all: main
+include config.mk
 
-main:
-	gcc src/main.c -o bin/main -lbcm2835 -I./include
+
+default: rmdirs all done
+
+all: mkdirs
+	@make -s -C src
+
+debug: mkdirs
+	make -C src
+
+mkdirs: rmdirs
+	@mkdir bin
+	@mkdir obj
+	@mkdir lib
+
+rmdirs:
+	@rm -rf bin
+	@rm -rf obj
+	@rm -rf lib
+
+clean: rmdirs
+	@echo "cleaning ..."
+	@echo "done! :)"
+
+done:
+	@echo "done! :)"
