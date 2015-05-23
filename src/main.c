@@ -1,95 +1,101 @@
 #include "main.h"
 
-#define SLAVE_ADDRESS 0x68
 
-int mpu6050_setup(void)
+int i2c_setup(void)
 {
-    int retval;
-    char buf[100];
-    char PWR_MGMT_REG = 0x6B;
-    char value = 0x00;
+    bcm2835I2CReasonCodes retval;
 
-    /* configure i2c */
     retval = bcm2835_init();
     if (retval == 0) {
         printf("%s\n", I2C_INIT_FAILED);
         return -1;
     }
-    bcm2835_i2c_setSlaveAddress(SLAVE_ADDRESS);
+    bcm2835_i2c_begin();
+
+    return 0;
+}
+
+void i2c_teardown(void)
+{
+    bcm2835_i2c_end();
+}
+
+int mpu6050_setup(void)
+{
+    char buf[2];
+
+    /* setup */
+    bcm2835_i2c_setSlaveAddress(MPU6050_ADDRESS);
 
     /* POWER MANAGEMENT */
-    bcm2835_i2c_begin();
-    value = 0x00;
     buf[0] = MPU6050_RA_PWR_MGMT_1;
     buf[1] = 0x00;
-    bcm2835_i2c_write(&buf, 2);
+    bcm2835_i2c_write(buf, 2);
+
+    return 0;
+}
+
+void mpu6050_ping(void)
+{
+    char buf[1];
+    char value[1];
+
+    /* setup */
+    buf[0] = MPU6050_RA_WHO_AM_I;
+    value[0] = 0x00;
+
+    /* print mpu6050 address */
+    bcm2835_i2c_read_register_rs(buf, value, 1);
+    printf("MPU6050 ADDRESS: 0x%02X\n", value[0]);
+}
+
+int mpu6050_data(struct mpu6050_data *data)
+{
+    char buf[1];
+    char sensor_data[14];
+    bcm2835I2CReasonCodes retval;
+
+    /* setup */
+    buf[0] = MPU6050_RA_ACCEL_XOUT_H;
+    memset(sensor_data, 0, 14);
+
+    /* read sensor data */
+    retval = bcm2835_i2c_write_read_rs(buf, 1, sensor_data, 14);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    /* accelerometer */
+    data->accel.x = (sensor_data[0] << 8) | (sensor_data[1]);
+    data->accel.y = (sensor_data[2] << 8) | (sensor_data[3]);
+    data->accel.z = (sensor_data[4] << 8) | (sensor_data[5]);
+
+    /* temperature */
+    data->temp = (sensor_data[6] << 8) | (sensor_data[7]);
+
+    /* gyroscope */
+    data->gyro.x = (sensor_data[8] << 8) | (sensor_data[9]);
+    data->gyro.y = (sensor_data[10] << 8) | (sensor_data[10]);
+    data->gyro.z = (sensor_data[12] << 8) | (sensor_data[13]);
 
     return 0;
 }
 
 int main(void)
 {
-    /* int i; */
-    char value[1];
-    /* char bytes_high[1]; */
-    /* char bytes_low[1]; */
-
-    char WHO_AM_I = 0x75;
-    char ACCEL_XOUT_H = 0x3B;
-    /* char GYRO_XOUT_H = 0x43; */
-    /* char GYRO_XOUT_L = 0x44; */
-
-    bcm2835I2CReasonCodes retval;
-
+    struct mpu6050_data data;
 
     /* setup */
+    i2c_setup();
     mpu6050_setup();
 
-    /* bcm2835_i2c_begin(); */
-    /* bcm2835_i2c_read_register_rs(&WHO_AM_I, value, 1); */
-    /* printf("who_am_i: %c\n", value[0]); */
-    /* bcm2835_i2c_end(); */
-
+    /* read values */
     while (1) {
-        char data[14];
-        retval = bcm2835_i2c_write_read_rs(&ACCEL_XOUT_H, 1, data, 14);
-        if (retval != BCM2835_I2C_REASON_OK) {
-            printf("NOT OK!\n");
-        }
-
-        int i;
-        /* for (i = 0; i < 14; i++) { */
-            printf("i: %d\n", data[0]);
-        /* } */
+        mpu6050_data(&data);
     }
 
-    /* for (i = 0; i < 10; i++) { */
-    /*     #<{(| start i2c |)}># */
-    /*     bcm2835_i2c_begin(); */
-    /*  */
-    /*     bytes_high[0] = 0x00; */
-    /*     retval = bcm2835_i2c_read_register_rs(&GYRO_XOUT_H, bytes_high, 1); */
-    /*     if (retval != BCM2835_I2C_REASON_OK) { */
-    /*         printf("NOT OK! X_H\n"); */
-    /*     } */
-    /*  */
-    /*     bytes_low[0] = 0x00; */
-    /*     retval = bcm2835_i2c_read_register_rs(&GYRO_XOUT_L, bytes_low, 1); */
-    /*     if (retval != BCM2835_I2C_REASON_OK) { */
-    /*         printf("NOT OK! X_L\n"); */
-    /*     } */
-    /*  */
-    /*     #<{(| value |= bytes_low; |)}># */
-    /*     #<{(| printf("gyro_x: %" PRIu16 "\n", value); |)}># */
-    /*     printf("gyro_x_h: %d\n", bytes_high[0]); */
-    /*     printf("gyro_x_l: %d\n", bytes_low[0]); */
-    /*     printf("\n"); */
-    /*  */
-    /*     #<{(| end i2c |)}># */
-    /*     bcm2835_i2c_end(); */
-    /* } */
-
-    bcm2835_i2c_end();
+    /* clean up */
+    i2c_teardown();
 
     return 0;
 }

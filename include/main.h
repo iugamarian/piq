@@ -2,6 +2,7 @@
 #define __MAIN_H__
 
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <inttypes.h>
 
@@ -367,18 +368,25 @@
 
 
 /* STRUCTS */
-struct gyro
+struct gyroscope
 {
     uint16_t x;
     uint16_t y;
     uint16_t z;
 };
 
-struct accel
+struct accelerometer
 {
     uint16_t x;
     uint16_t y;
     uint16_t z;
+};
+
+struct mpu6050_data
+{
+    struct gyroscope gyro;
+    struct accelerometer accel;
+    float temp;
 };
 
 
@@ -387,6 +395,11 @@ struct accel
 
 
 /* FUNCTIONS */
+int i2c_setup(void);
+void i2c_teardown(void);
 
+int mpu6050_setup(void);
+void mpu6050_ping(void);
+int mpu6050_data(struct mpu6050_data *data);
 
 #endif
