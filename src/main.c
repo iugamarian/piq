@@ -81,17 +81,38 @@ int mpu6050_data(struct mpu6050_data *data)
     return 0;
 }
 
+size_t mpu6050_data_print(struct mpu6050_data *data, size_t prev_length)
+{
+    size_t i;
+    char buf[500];
+    size_t length;
+
+    /* for (i = 0; i < prev_length; i++) { */
+    /*     printf("\b \b"); */
+    /* } */
+
+    sprintf(buf, "gyro_x: %d", data->gyro.x);
+    length = strlen(buf);
+    printf("%s", buf);
+
+    return length;
+}
+
 int main(void)
 {
     struct mpu6050_data data;
+    size_t length;
 
     /* setup */
     i2c_setup();
     mpu6050_setup();
 
     /* read values */
+    printf("\n");
+    length = 0;
     while (1) {
         mpu6050_data(&data);
+        length = mpu6050_data_print(&data, length);
     }
 
     /* clean up */
