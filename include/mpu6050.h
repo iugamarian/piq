@@ -1,21 +1,22 @@
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef __MPU6050_H__
+#define __MPU6050_H__
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <inttypes.h>
 
 #include <bcm2835.h>
 
+#include "i2c.h"
 
 
-/* REGISTER ADDRESSES */
+/* GENERAL */
 #define MPU6050_ADDRESS                 0x68
 #define MPU6050_ADDRESS_AD0_LOW         0x68  // addr pin low (GND) [default]
 #define MPU6050_ADDRESS_AD0_HIGH        0x69  // addr pin high (VCC)
 
+/* REGISTER ADDRESSES */
 #define MPU6050_RA_XG_OFFS_TC           0x00
 #define MPU6050_RA_YG_OFFS_TC           0x01
 #define MPU6050_RA_ZG_OFFS_TC           0x02
@@ -128,6 +129,7 @@
 #define MPU6050_RA_WHO_AM_I             0x75
 
 
+
 /* STRUCTURES */
 struct gyroscope
 {
@@ -151,15 +153,9 @@ struct mpu6050_data
 };
 
 
-/* ERROR MESSAGES */
-#define I2C_INIT_FAILED "failed to initialize I2C!"
-
-
 /* FUNCTIONS */
-int i2c_setup(void);
-void i2c_teardown(void);
-
 int mpu6050_setup(void);
+void mpu6050_teardown(void);
 int mpu6050_ping(void);
 int mpu6050_data(struct mpu6050_data *data);
 void mpu6050_data_print(struct mpu6050_data *data);

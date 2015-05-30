@@ -1,30 +1,12 @@
-#include "main.h"
+#include "mpu6050.h"
 
-
-int i2c_setup(void)
-{
-    bcm2835I2CReasonCodes retval;
-
-    retval = bcm2835_init();
-    if (retval == 0) {
-        printf("%s\n", I2C_INIT_FAILED);
-        return -1;
-    }
-    bcm2835_i2c_begin();
-
-    return 0;
-}
-
-void i2c_teardown(void)
-{
-    bcm2835_i2c_end();
-}
 
 int mpu6050_setup(void)
 {
     char buf[2];
 
     /* setup */
+    i2c_setup();
     bcm2835_i2c_setSlaveAddress(MPU6050_ADDRESS);
 
     /* POWER MANAGEMENT */
@@ -33,6 +15,11 @@ int mpu6050_setup(void)
     bcm2835_i2c_write(buf, 2);
 
     return 0;
+}
+
+void mpu6050_teardown(void)
+{
+    i2c_teardown();
 }
 
 int mpu6050_ping(void)
@@ -254,29 +241,4 @@ void mpu6050_data_print(struct mpu6050_data *data)
 
     printf("temp: %f\n", data->temperature);
     printf("\n");
-}
-
-int main(void)
-{
-    /* struct mpu6050_data data; */
-
-    /* setup */
-    i2c_setup();
-    mpu6050_setup();
-    /* mpu6050_calibrate(); */
-    mpu6050_gyroscope_test();
-    mpu6050_accelerometer_test();
-
-    /* read values */
-    /* printf("\n"); */
-    /* while (1) { */
-    /*     mpu6050_data(&data); */
-    /*     mpu6050_data_print(&data); */
-    /*     sleep(2); */
-    /* } */
-
-    /* clean up */
-    i2c_teardown();
-
-    return 0;
 }

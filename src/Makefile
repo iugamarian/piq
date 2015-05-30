@@ -2,11 +2,16 @@ include $(PWD)/config.mk
 FOLDER_NAME = src
 
 SRCS = $(wildcard *.c)
-EXES = $(SRCS:.c=)
+OBJS = $(SRCS:.c=.o)
 
 
-default: $(EXES)
+default: libpiq piq
 
-%: %.c
-	echo "HERE"
+%.o: %.c
+	$(MAKE_OBJ)
+
+libpiq: $(OBJS)
+	$(MAKE_STATIC_LIB)
+
+piq:
 	$(MAKE_EXE)
