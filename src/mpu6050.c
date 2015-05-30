@@ -1,7 +1,7 @@
 #include "mpu6050.h"
 
 
-int mpu6050_setup(void)
+int8_t mpu6050_setup(void)
 {
     char buf[2];
 
@@ -22,7 +22,7 @@ void mpu6050_teardown(void)
     i2c_teardown();
 }
 
-int mpu6050_ping(void)
+int8_t mpu6050_ping(void)
 {
     char buf[1];
     char value[1];
@@ -38,7 +38,7 @@ int mpu6050_ping(void)
     return 0;
 }
 
-int mpu6050_data(struct mpu6050_data *data)
+int8_t mpu6050_data(struct mpu6050_data *data)
 {
     char buf[1];
     char raw_data[14];
@@ -77,131 +77,7 @@ int mpu6050_data(struct mpu6050_data *data)
     return 0;
 }
 
-int mpu6050_gyroscope_test(void)
-{
-    char w_data[2];
-    char fs_sel;
-    struct mpu6050_data data_before;
-    struct mpu6050_data data_after;
-    int16_t gyro_x_diff;
-    int16_t gyro_y_diff;
-    int16_t gyro_z_diff;
-
-    /*
-    This function performs a gyroscope self-test on the MPU6050 sensor, this is
-    intiated by setting the `XG_ST`, `YG_ST` and `ZG_ST` to 1 respectively in
-    the `GYRO_CONFIG` register.
-
-    In the [Register Map document (page 14)][1] it says:
-
-    > When the value of the self-test response is within the min/max limits >
-    of the product specification, the part has passed self test.
-
-    According to the datasheet (page 12), it states that the min/max is a
-    relative +/- 14% of the sensor data, before and after the self-test is
-    enabled.
-    */
-
-    /* gyro data before self-test enabled */
-    mpu6050_data(&data_before);
-    mpu6050_data_print(&data_before);
-
-    /* enable gyro self test */
-    fs_sel = 0x00;
-    w_data[0] = MPU6050_RA_GYRO_CONFIG;
-    w_data[1] = (
-       (1 << 7)         /* XG_ST */
-       | (1 << 6)       /* YG_ST */
-       | (1 << 5)       /* ZG_ST */
-       | (fs_sel << 3)  /* FS_SEL */
-    );
-    bcm2835_i2c_write(w_data, 2);
-
-    /* gyro data after self-test enabled */
-    mpu6050_data(&data_after);
-    mpu6050_data_print(&data_after);
-
-    /* disable gyro self test */
-    fs_sel = 0x00;
-    w_data[0] = MPU6050_RA_GYRO_CONFIG;
-    w_data[1] = (fs_sel << 3);  /* FS_SEL */
-    bcm2835_i2c_write(w_data, 2);
-
-    /* calculate x, y, z before and after self-test enabled */
-    gyro_x_diff = abs(data_after.gyro.x) - abs(data_before.gyro.x);
-    gyro_y_diff = abs(data_after.gyro.y) - abs(data_before.gyro.y);
-    gyro_z_diff = abs(data_after.gyro.z) - abs(data_before.gyro.z);
-
-    printf("x: %d\n", gyro_x_diff);
-    printf("y: %d\n", gyro_y_diff);
-    printf("z: %d\n", gyro_z_diff);
-
-    return 0;
-}
-
-int mpu6050_accelerometer_test(void)
-{
-    char w_data[2];
-    char afs_sel;
-    struct mpu6050_data data_before;
-    struct mpu6050_data data_after;
-    int16_t accel_x_diff;
-    int16_t accel_y_diff;
-    int16_t accel_z_diff;
-
-    /*
-    This function performs a accelerometer self-test on the MPU6050 sensor,
-    this is intiated by setting the `XA_ST`, `YA_ST` and `ZA_ST` to 1
-    respectively in the `ACCEL_CONFIG` register.
-
-    In the [Register Map document (page 15)][1] it says:
-
-    > When the value of the self-test response is within the min/max limits >
-    of the product specification, the part has passed self test.
-
-    According to the datasheet (page 13), it states that the min/max is a
-    relative +/- 14% of the sensor data, before and after the self-test is
-    enabled.
-    */
-
-    /* accel data before self-test enabled */
-    mpu6050_data(&data_before);
-    mpu6050_data_print(&data_before);
-
-    /* enable accel self test */
-    afs_sel = 0x00;
-    w_data[0] = MPU6050_RA_ACCEL_CONFIG;
-    w_data[1] = (
-       (1 << 7)             /* XA_ST */
-       | (1 << 6)           /* YA_ST */
-       | (1 << 5)           /* ZA_ST */
-       | (afs_sel << 3)     /* AFS_SEL */
-    );
-    bcm2835_i2c_write(w_data, 2);
-
-    /* accel data after self-test enabled */
-    mpu6050_data(&data_after);
-    mpu6050_data_print(&data_after);
-
-    /* disable accel self test */
-    afs_sel = 0x00;
-    w_data[0] = MPU6050_RA_GYRO_CONFIG;
-    w_data[1] = (afs_sel << 3);  /* AFS_SEL */
-    bcm2835_i2c_write(w_data, 2);
-
-    /* calculate x, y, z before and after self-test enabled */
-    accel_x_diff = abs(data_after.accel.x) - abs(data_before.accel.x);
-    accel_y_diff = abs(data_after.accel.y) - abs(data_before.accel.y);
-    accel_z_diff = abs(data_after.accel.z) - abs(data_before.accel.z);
-
-    printf("x: %d\n", accel_x_diff);
-    printf("y: %d\n", accel_y_diff);
-    printf("z: %d\n", accel_z_diff);
-
-    return 0;
-}
-
-int mpu6050_calibrate(void)
+int8_t mpu6050_calibrate(void)
 {
     int16_t i;
     int16_t offset_x;
@@ -241,4 +117,116 @@ void mpu6050_data_print(struct mpu6050_data *data)
 
     printf("temp: %f\n", data->temperature);
     printf("\n");
+}
+
+int8_t mpu6050_get_sample_rate_div(void)
+{
+    char buf[1];
+    char data[1];
+    uint8_t retval;
+
+    /* get sample rate */
+    buf[0] = MPU6050_RA_SMPLRT_DIV;
+    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    return data[0];
+}
+
+int8_t mpu6050_set_sample_rate_div(int8_t div)
+{
+    char buf[1];
+    uint8_t retval;
+
+    /* set sample rate */
+    buf[0] = MPU6050_RA_SMPLRT_DIV;
+    buf[1] = div;
+    retval = bcm2835_i2c_write(buf, 2);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int8_t mpu6050_get_gyro_range(void)
+{
+    char buf[1];
+    char data[1];
+    uint8_t retval;
+
+    /* get gyro config */
+    buf[0] = MPU6050_RA_GYRO_CONFIG;
+    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    /* get gyro range bits */
+    data[0] = (data[0] >> 3) & 0b00000011;
+
+    return data[0];
+}
+
+int8_t mpu6050_set_gyro_range(int8_t range)
+{
+    char buf[1];
+    uint8_t retval;
+
+    /* pre-check */
+    if (range > 3 || range < 0) {
+        return -2;
+    }
+
+    /* set sample rate */
+    buf[0] = MPU6050_RA_GYRO_CONFIG;
+    buf[1] = range << 3;
+    retval = bcm2835_i2c_write(buf, 2);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int8_t mpu6050_get_accel_range(void)
+{
+    char buf[1];
+    char data[1];
+    uint8_t retval;
+
+    /* get accel config */
+    buf[0] = MPU6050_RA_ACCEL_CONFIG;
+    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    /* get accel range bits */
+    data[0] = (data[0] >> 3) & 0b00000011;
+
+    return data[0];
+}
+
+int8_t mpu6050_set_accel_range(int8_t range)
+{
+    char buf[1];
+    uint8_t retval;
+
+    /* pre-check */
+    if (range > 3 || range < 0) {
+        return -2;
+    }
+
+    /* set sample rate */
+    buf[0] = MPU6050_RA_ACCEL_CONFIG;
+    buf[1] = range << 3;
+    retval = bcm2835_i2c_write(buf, 2);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    return 0;
 }
