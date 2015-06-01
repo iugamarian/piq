@@ -1,2 +1,3 @@
 #!/bin/sh
-make
+# make
+python scripts/plot.py

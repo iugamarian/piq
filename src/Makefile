@@ -1,7 +1,7 @@
 include $(PWD)/config.mk
 FOLDER_NAME = src
 
-SRCS = $(wildcard *.c)
+SRCS = $(filter-out piq.c, $(wildcard *.c))
 OBJS = $(SRCS:.c=.o)
 
 
