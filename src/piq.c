@@ -24,19 +24,20 @@ int main(void)
     dt = ((double) time_now - time_start) / CLOCKS_PER_SEC;
 
     printf("\n");
-    printf("recording!\n");
-    while (dt < 20) {
+    printf("running!\n");
+    int i = 0;
+    while (1) {
         mpu6050_data(&data);
         mpu6050_record_data(output_file, &data);
 
         time_now = clock();
         dt = ((double) time_now - time_start) / CLOCKS_PER_SEC;
 
-        if (dt == 10) {
-            printf("10 seconds ...\n");
+        if (i == 1000) {
+            break;
         }
+        i++;
     }
-    printf("done!\n");
 
     /* clean up */
     fclose(output_file);

@@ -8,6 +8,7 @@
 #include <math.h>
 #include <float.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <bcm2835.h>
 
@@ -181,6 +182,9 @@ struct mpu6050_data
 
     float temperature;
     int16_t sample_rate;
+
+    float pitch;
+    float roll;
 
     clock_t last_updated;
 };
