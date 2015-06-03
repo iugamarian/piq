@@ -22,6 +22,9 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
     data->accel.pitch = FLT_MIN;
     data->accel.roll = FLT_MIN;
 
+    data->pitch = 0;
+    data->roll = 0;
+
     data->sample_rate = -1;
 
     /* set config register */
@@ -170,6 +173,10 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     data->gyro.z = data->gyro.raw_z / data->gyro.sensitivity;
 
     gyroscope_calc_angle(data);
+
+    /* complimentary filter */
+    data->pitch = (0.98 * data->gyro.pitch) + (0.02 * data->accel.pitch);
+    data->roll = (0.98 * data->gyro.roll) + (0.02 * data->accel.roll);
 
     return 0;
 }
@@ -391,7 +398,10 @@ int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data)
     fprintf(output_file, "%f,", data->accel.y);
     fprintf(output_file, "%f,", data->accel.z);
     fprintf(output_file, "%f,", data->accel.pitch);
-    fprintf(output_file, "%f\n", data->accel.roll);
+    fprintf(output_file, "%f,", data->accel.roll);
+
+    fprintf(output_file, "%f,", data->pitch);
+    fprintf(output_file, "%f\n", data->roll);
 
     return 0;
 }
