@@ -7,6 +7,7 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
     char buf[2];
 
     /* setup */
+    log_info("initializing mpu6050");
     bcm2835_i2c_setSlaveAddress(MPU6050_ADDRESS);
 
     /* set intial values */
@@ -104,23 +105,10 @@ static void accelerometer_calc_angle(struct mpu6050_data *data)
     data->accel.roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
 }
 
-static void gyroscope_calc_angle(struct mpu6050_data *data)
+static void gyroscope_calc_angle(struct mpu6050_data *data, float dt)
 {
-    double dt;
-    clock_t time_now;
-
-    if (data->gyro.pitch == FLT_MIN && data->gyro.roll == FLT_MIN) {
-        data->gyro.pitch = data->gyro.x;
-        data->gyro.roll = data->gyro.y;
-    } else {
-        time_now = clock();
-        dt = ((double) time_now - data->last_updated) / CLOCKS_PER_SEC;
-        data->gyro.roll += data->gyro.x * dt;
-        data->gyro.pitch += data->gyro.y * dt * -1;
-    }
-
-    /* set last_updated */
-    data->last_updated = clock();
+    data->gyro.roll = (data->gyro.x * dt) + data->roll;
+    data->gyro.pitch = (data->gyro.y * dt) + data->pitch;
 }
 
 int8_t mpu6050_data(struct mpu6050_data *data)
@@ -128,6 +116,8 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     char buf[1];
     char raw_data[14];
     int8_t raw_temp;
+    float dt;
+    clock_t time_now;
     bcm2835I2CReasonCodes retval;
 
     /* setup */
@@ -153,8 +143,6 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     data->accel.y = data->accel.raw_y / data->accel.sensitivity;
     data->accel.z = data->accel.raw_z / data->accel.sensitivity;
 
-    accelerometer_calc_angle(data);
-
     /* temperature */
     raw_temp = (raw_data[6] << 8) | (raw_data[7]);
     data->temperature = raw_temp / 340.0 + 36.53;
@@ -172,11 +160,18 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     data->gyro.y = data->gyro.raw_y / data->gyro.sensitivity;
     data->gyro.z = data->gyro.raw_z / data->gyro.sensitivity;
 
-    gyroscope_calc_angle(data);
+    /* calculate dt */
+    time_now = clock();
+    dt = ((double) time_now - data->last_updated) / CLOCKS_PER_SEC;
 
     /* complimentary filter */
+    accelerometer_calc_angle(data);
     data->pitch = (0.98 * data->gyro.pitch) + (0.02 * data->accel.pitch);
     data->roll = (0.98 * data->gyro.roll) + (0.02 * data->accel.roll);
+    gyroscope_calc_angle(data, dt);
+
+    /* set last_updated */
+    data->last_updated = clock();
 
     return 0;
 }
@@ -184,6 +179,12 @@ int8_t mpu6050_data(struct mpu6050_data *data)
 int8_t mpu6050_calibrate(struct mpu6050_data *data)
 {
     int16_t i;
+
+    /* let it stablize for a while first */
+    log_info("calibrating mpu6050");
+    for (i = 0; i < 5000; i++) {
+        mpu6050_data(data);
+    }
 
     /* calculate offset */
     for (i = 0; i < 5000; i++) {
@@ -193,14 +194,18 @@ int8_t mpu6050_calibrate(struct mpu6050_data *data)
         data->accel.offset_y += data->accel.raw_y;
         data->accel.offset_z += data->accel.raw_z;
 
-        data->gyro.offset_x += data->gyro.raw_x / 2.0;
-        data->gyro.offset_y += data->gyro.raw_y / 2.0;
-        data->gyro.offset_z += data->gyro.raw_z / 2.0;
+        data->gyro.offset_x += data->gyro.raw_x;
+        data->gyro.offset_y += data->gyro.raw_y;
+        data->gyro.offset_z += data->gyro.raw_z;
     }
 
     data->accel.offset_x = data->accel.offset_x / 5000.0;
     data->accel.offset_y = data->accel.offset_y / 5000.0;
     data->accel.offset_z = data->accel.offset_z / 5000.0;
+
+    data->gyro.offset_x = data->gyro.offset_x / 5000.0;
+    data->gyro.offset_y = data->gyro.offset_y / 5000.0;
+    data->gyro.offset_z = data->gyro.offset_z / 5000.0;
 
     return 0;
 }

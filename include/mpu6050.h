@@ -13,6 +13,7 @@
 #include <bcm2835.h>
 
 #include "i2c.h"
+#include "utils.h"
 
 
 /* GENERAL */

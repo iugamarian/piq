@@ -4,25 +4,16 @@
 int main(void)
 {
     struct mpu6050_data data;
-    clock_t time_start;
-    clock_t time_now;
-    double dt;
     FILE *output_file;
 
     /* setup */
     i2c_setup();
     mpu6050_setup(&data);
-    mpu6050_info(&data);
-    mpu6050_data(&data);
-    mpu6050_data_print(&data);
+    /* mpu6050_info(&data); */
 
     output_file = fopen("output.dat", "w");
 
     /* read values */
-    time_start = clock();
-    time_now = clock();
-    dt = ((double) time_now - time_start) / CLOCKS_PER_SEC;
-
     printf("\n");
     printf("running!\n");
     int i = 0;
@@ -30,12 +21,10 @@ int main(void)
         mpu6050_data(&data);
         mpu6050_record_data(output_file, &data);
 
-        time_now = clock();
-        dt = ((double) time_now - time_start) / CLOCKS_PER_SEC;
-
-        if (i == 1000) {
+        if (i == 10000) {
             break;
         }
+
         i++;
     }
 

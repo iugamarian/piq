@@ -33,10 +33,13 @@ if __name__ == "__main__":
         roll.append(row[11])
 
     plt.plot(gyro_pitch, label="gyro pitch")
-    plt.plot(gyro_roll, label="gyro roll")
     plt.plot(accel_pitch, label="accel pitch")
-    plt.plot(accel_roll, label="accel roll")
     plt.plot(pitch, label="pitch")
+    plt.legend(loc='upper left')
+    plt.show()
+
+    plt.plot(gyro_roll, label="gyro roll")
+    plt.plot(accel_roll, label="accel roll")
     plt.plot(roll, label="roll")
     plt.legend(loc='upper left')
     plt.show()
