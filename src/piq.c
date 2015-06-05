@@ -9,13 +9,11 @@ int main(void)
     /* setup */
     i2c_setup();
     mpu6050_setup(&data);
-    /* mpu6050_info(&data); */
 
     output_file = fopen("output.dat", "w");
 
     /* read values */
-    printf("\n");
-    printf("running!\n");
+    log_info("running\n");
     int i = 0;
     while (1) {
         mpu6050_data(&data);

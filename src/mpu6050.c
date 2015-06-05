@@ -4,24 +4,23 @@
 int8_t mpu6050_setup(struct mpu6050_data *data)
 {
     int8_t retval;
-    char buf[2];
 
     /* setup */
     log_info("initializing mpu6050");
-    bcm2835_i2c_setSlaveAddress(MPU6050_ADDRESS);
+    i2c_set_slave(MPU6050_ADDRESS);
 
     /* set intial values */
     data->gyro.offset_x = 0;
     data->gyro.offset_y = 0;
     data->gyro.offset_z = 0;
-    data->gyro.pitch = FLT_MIN;
-    data->gyro.roll = FLT_MIN;
+    data->gyro.pitch = 0;
+    data->gyro.roll = 0;
 
     data->accel.offset_x = 0;
     data->accel.offset_y = 0;
     data->accel.offset_z = 0;
-    data->accel.pitch = FLT_MIN;
-    data->accel.roll = FLT_MIN;
+    data->accel.pitch = 0;
+    data->accel.roll = 0;
 
     data->pitch = 0;
     data->roll = 0;
@@ -29,14 +28,10 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
     data->sample_rate = -1;
 
     /* set config register */
-    buf[0] = MPU6050_RA_CONFIG;
-    buf[1] = 0x00;
-    bcm2835_i2c_write(buf, 2);
+    i2c_write_byte(MPU6050_RA_CONFIG, 0x00);
 
     /* set power management register */
-    buf[0] = MPU6050_RA_PWR_MGMT_1;
-    buf[1] = 0x00;
-    bcm2835_i2c_write(buf, 2);
+    i2c_write_byte(MPU6050_RA_PWR_MGMT_1, 0x00);
 
     /* get gyro range */
     mpu6050_set_gyro_range(0);
@@ -75,16 +70,12 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
 
 int8_t mpu6050_ping(void)
 {
-    char buf[1];
-    char value[1];
-
-    /* setup */
-    buf[0] = MPU6050_RA_WHO_AM_I;
-    value[0] = 0x00;
+    char data[1];
 
     /* print mpu6050 address */
-    bcm2835_i2c_read_register_rs(buf, value, 1);
-    printf("MPU6050 ADDRESS: 0x%02X\n", value[0]);
+    data[0] = 0x00;
+    i2c_read_bytes(MPU6050_RA_WHO_AM_I, data, 1);
+    printf("MPU6050 ADDRESS: 0x%02X\n", data[0]);
 
     return 0;
 }
@@ -113,20 +104,16 @@ static void gyroscope_calc_angle(struct mpu6050_data *data, float dt)
 
 int8_t mpu6050_data(struct mpu6050_data *data)
 {
-    char buf[1];
     char raw_data[14];
     int8_t raw_temp;
     float dt;
     clock_t time_now;
-    bcm2835I2CReasonCodes retval;
-
-    /* setup */
-    buf[0] = MPU6050_RA_ACCEL_XOUT_H;
-    memset(raw_data, 0, 14);
+    int retval;
 
     /* read sensor data */
-    retval = bcm2835_i2c_write_read_rs(buf, 1, raw_data, 14);
-    if (retval != BCM2835_I2C_REASON_OK) {
+    memset(raw_data, 0, 14);
+    retval = i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, raw_data, 14);
+    if (retval != 0) {
         return -1;
     }
 
@@ -265,14 +252,13 @@ int16_t mpu6050_get_sample_rate(void)
 
 int8_t mpu6050_get_sample_rate_div(void)
 {
-    char buf[1];
     char data[1];
-    uint8_t retval;
+    int retval;
 
     /* get sample rate */
-    buf[0] = MPU6050_RA_SMPLRT_DIV;
-    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
-    if (retval != BCM2835_I2C_REASON_OK) {
+    data[0] = 0x00;
+    retval = i2c_read_bytes(MPU6050_RA_SMPLRT_DIV, data, 1);
+    if (retval != 0) {
         return -1;
     }
 
@@ -281,14 +267,13 @@ int8_t mpu6050_get_sample_rate_div(void)
 
 int8_t mpu6050_set_sample_rate_div(int8_t div)
 {
-    char buf[1];
-    uint8_t retval;
+    char data[1];
+    int retval;
 
     /* set sample rate divider */
-    buf[0] = MPU6050_RA_SMPLRT_DIV;
-    buf[1] = div;
-    retval = bcm2835_i2c_write(buf, 2);
-    if (retval != BCM2835_I2C_REASON_OK) {
+    data[0] = div;
+    retval = i2c_write_bytes(MPU6050_RA_SMPLRT_DIV, data, 1);
+    if (retval != 0) {
         return -1;
     }
 
@@ -297,18 +282,17 @@ int8_t mpu6050_set_sample_rate_div(int8_t div)
 
 int8_t mpu6050_get_gyro_range(void)
 {
-    char buf[1];
     char data[1];
-    uint8_t retval;
+    int retval;
 
     /* get gyro config */
-    buf[0] = MPU6050_RA_GYRO_CONFIG;
-    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
-    if (retval != BCM2835_I2C_REASON_OK) {
+    data[0] = 0x00;
+    retval = i2c_read_bytes(MPU6050_RA_GYRO_CONFIG, data, 1);
+    if (retval != 0) {
         return -1;
     }
 
-    /* get gyro range bits */
+    /* get gyro range bytes */
     data[0] = (data[0] >> 3) & 0b00000011;
 
     return data[0];
@@ -316,7 +300,7 @@ int8_t mpu6050_get_gyro_range(void)
 
 int8_t mpu6050_set_gyro_range(int8_t range)
 {
-    char buf[1];
+    char data[1];
     uint8_t retval;
 
     /* pre-check */
@@ -325,10 +309,9 @@ int8_t mpu6050_set_gyro_range(int8_t range)
     }
 
     /* set sample rate */
-    buf[0] = MPU6050_RA_GYRO_CONFIG;
-    buf[1] = range << 3;
-    retval = bcm2835_i2c_write(buf, 2);
-    if (retval != BCM2835_I2C_REASON_OK) {
+    data[0] = range << 3;
+    retval = i2c_write_bytes(MPU6050_RA_GYRO_CONFIG, data, 1);
+    if (retval != 0) {
         return -1;
     }
 
@@ -337,18 +320,17 @@ int8_t mpu6050_set_gyro_range(int8_t range)
 
 int8_t mpu6050_get_accel_range(void)
 {
-    char buf[1];
     char data[1];
     uint8_t retval;
 
     /* get accel config */
-    buf[0] = MPU6050_RA_ACCEL_CONFIG;
-    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
-    if (retval != BCM2835_I2C_REASON_OK) {
+    data[0] = 0x00;
+    retval = i2c_write_bytes(MPU6050_RA_ACCEL_CONFIG, data, 1);
+    if (retval != 0) {
         return -1;
     }
 
-    /* get accel range bits */
+    /* get accel range bytes */
     data[0] = (data[0] >> 3) & 0b00000011;
 
     return data[0];
@@ -356,7 +338,7 @@ int8_t mpu6050_get_accel_range(void)
 
 int8_t mpu6050_set_accel_range(int8_t range)
 {
-    char buf[1];
+    char data[1];
     uint8_t retval;
 
     /* pre-check */
@@ -365,10 +347,9 @@ int8_t mpu6050_set_accel_range(int8_t range)
     }
 
     /* set sample rate */
-    buf[0] = MPU6050_RA_ACCEL_CONFIG;
-    buf[1] = range << 3;
-    retval = bcm2835_i2c_write(buf, 2);
-    if (retval != BCM2835_I2C_REASON_OK) {
+    data[0] = range << 3;
+    retval = i2c_write_bytes(MPU6050_RA_ACCEL_CONFIG, data, 2);
+    if (retval != 0) {
         return -1;
     }
 
