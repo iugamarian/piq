@@ -5,6 +5,7 @@ int main(void)
 {
     struct mpu6050_data data;
     FILE *output_file;
+    int8_t retval;
 
     /* setup */
     i2c_setup();
@@ -16,8 +17,19 @@ int main(void)
     log_info("running\n");
     int i = 0;
     while (1) {
-        mpu6050_data(&data);
+        /* get data */
+        retval = mpu6050_data(&data);
+        if (retval == -1) {
+            log_err("Failed to obtain data from MPU6050!");
+            return -1;
+        }
+
+        /* record data */
         mpu6050_record_data(output_file, &data);
+        if (retval == -1) {
+            log_err("Failed to record MPU6050 data!");
+            return -1;
+        }
 
         if (i == 10000) {
             break;
