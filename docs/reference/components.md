@@ -1,4 +1,14 @@
-## Motor
+# Components
+
+**Contents**:
+- Motors
+- ESC
+- Battery
+- IMU
+
+
+
+## Motors
 
 
     Brand: Emax
@@ -45,10 +55,10 @@
 
 ## Battery
 
-    Brannd: ZIPPY
+    Brand: ZIPPY
     Name: ZIPPY Flightmax 4000mAh 3S1P 40C
 
-    Spec.
+    Specs:
     - Capacity: 4000mAh
     - Voltage: 3S1P / 3 Cell / 11.1v
     - Discharge: 40C Constant / 50C Burst
@@ -56,3 +66,15 @@
     - Dimensions: 145 x 50 x 21mm
     - Balance Plug: JST-XH
     - Discharge plug: 4mm Bullet-connector
+
+
+
+## IMU
+
+    Brand: InvenSense
+    Name: GY-521 MPU6050
+
+    Specs:
+    - Accelerometer ranges: ±2, ±4, ±8, ±16g
+    - Gyroscope ranges: ± 250, 500, 1000, 2000 °/s
+    - Voltage range: 3.3V - 5V
