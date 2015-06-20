@@ -74,6 +74,7 @@ int8_t mpu6050_ping(void)
 
     /* print mpu6050 address */
     data[0] = 0x00;
+    i2c_set_slave(MPU6050_ADDRESS);
     i2c_read_bytes(MPU6050_RA_WHO_AM_I, data, 1);
     printf("MPU6050 ADDRESS: 0x%02X\n", data[0]);
 
@@ -112,6 +113,7 @@ int8_t mpu6050_data(struct mpu6050_data *data)
 
     /* read sensor data */
     memset(raw_data, 0, 14);
+    i2c_set_slave(MPU6050_ADDRESS);
     retval = i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, raw_data, 14);
     if (retval != 0) {
         return -1;
@@ -257,6 +259,7 @@ int8_t mpu6050_get_sample_rate_div(void)
 
     /* get sample rate */
     data[0] = 0x00;
+    i2c_set_slave(MPU6050_ADDRESS);
     retval = i2c_read_bytes(MPU6050_RA_SMPLRT_DIV, data, 1);
     if (retval != 0) {
         return -1;
@@ -272,6 +275,7 @@ int8_t mpu6050_set_sample_rate_div(int8_t div)
 
     /* set sample rate divider */
     data[0] = div;
+    i2c_set_slave(MPU6050_ADDRESS);
     retval = i2c_write_bytes(MPU6050_RA_SMPLRT_DIV, data, 1);
     if (retval != 0) {
         return -1;
@@ -287,6 +291,7 @@ int8_t mpu6050_get_gyro_range(void)
 
     /* get gyro config */
     data[0] = 0x00;
+    i2c_set_slave(MPU6050_ADDRESS);
     retval = i2c_read_bytes(MPU6050_RA_GYRO_CONFIG, data, 1);
     if (retval != 0) {
         return -1;
@@ -310,6 +315,7 @@ int8_t mpu6050_set_gyro_range(int8_t range)
 
     /* set sample rate */
     data[0] = range << 3;
+    i2c_set_slave(MPU6050_ADDRESS);
     retval = i2c_write_bytes(MPU6050_RA_GYRO_CONFIG, data, 1);
     if (retval != 0) {
         return -1;
@@ -325,6 +331,7 @@ int8_t mpu6050_get_accel_range(void)
 
     /* get accel config */
     data[0] = 0x00;
+    i2c_set_slave(MPU6050_ADDRESS);
     retval = i2c_write_bytes(MPU6050_RA_ACCEL_CONFIG, data, 1);
     if (retval != 0) {
         return -1;
@@ -348,6 +355,7 @@ int8_t mpu6050_set_accel_range(int8_t range)
 
     /* set sample rate */
     data[0] = range << 3;
+    i2c_set_slave(MPU6050_ADDRESS);
     retval = i2c_write_bytes(MPU6050_RA_ACCEL_CONFIG, data, 2);
     if (retval != 0) {
         return -1;
