@@ -104,7 +104,7 @@ struct pca9685
 void pca9685_setup(void);
 void pca9685_set_pwm_frequency(uint8_t freq);
 void pca9685_set_pwm(uint8_t channel, uint8_t duty_cycle);
-void pca9685_set_all_pwm(uint8_t duty_cycle)
+void pca9685_set_all_pwm(uint8_t duty_cycle);
 
 
 #endif

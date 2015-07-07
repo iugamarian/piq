@@ -25,6 +25,23 @@ void i2c_set_slave(char slave_addr)
     bcm2835_i2c_setSlaveAddress(slave_addr);
 }
 
+int i2c_read_byte(char reg_addr, char *data)
+{
+    char buf[1];
+    bcm2835I2CReasonCodes retval;
+
+    /* setup */
+    buf[0] = reg_addr;
+
+    /* read bytes */
+    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    return 0;
+}
+
 int i2c_read_bytes(char reg_addr, char *data, size_t data_length)
 {
     char buf[1];
