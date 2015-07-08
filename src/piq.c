@@ -27,9 +27,8 @@ int manual_control(void)
 
 int main(void)
 {
-    while (1) {
-        manual_control();
-    }
+    pca9685_setup();
+    pca9685_set_pwm_frequency(400);
 
     /* struct mpu6050_data data; */
     /* FILE *output_file; */

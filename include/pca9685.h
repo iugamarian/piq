@@ -90,19 +90,12 @@
 #define PCA9685_WAIT_MS 5
 
 
-/* STRUCTS */
-struct pca9685
-{
-    uint8_t i2c_addr;
-};
-
-
 /* ERROR MESSAGES */
 
 
 /* FUNCTIONS */
 void pca9685_setup(void);
-void pca9685_set_pwm_frequency(uint8_t freq);
+void pca9685_set_pwm_frequency(int freq);
 void pca9685_set_pwm(uint8_t channel, uint8_t duty_cycle);
 void pca9685_set_all_pwm(uint8_t duty_cycle);
 

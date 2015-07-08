@@ -50,7 +50,7 @@ void pca9685_setup(void)
     pca9685_config_mode1_register();
 }
 
-void pca9685_set_pwm_frequency(uint8_t freq)
+void pca9685_set_pwm_frequency(int freq)
 {
     float prescale;
     char mode_1_old;
