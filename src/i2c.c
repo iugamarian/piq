@@ -34,7 +34,7 @@ int i2c_read_byte(char reg_addr, char *data)
     buf[0] = reg_addr;
 
     /* read bytes */
-    retval = bcm2835_i2c_write_read_rs(buf, 1, data, 1);
+    retval = bcm2835_i2c_read_register_rs(buf, data, 1);
     if (retval != BCM2835_I2C_REASON_OK) {
         return -1;
     }
@@ -74,7 +74,7 @@ int i2c_write_bytes(char reg_addr, char *data, size_t data_length)
         buf[i] = data[i];
     }
 
-    /* read bytes */
+    /* write bytes */
     retval = bcm2835_i2c_write(buf, data_length + 1);
     if (retval != BCM2835_I2C_REASON_OK) {
         return -1;

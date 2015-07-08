@@ -1,34 +1,43 @@
 #include "piq.h"
 
 
-int manual_control(void)
-{
-    char c;
-    struct terminal_settings ts;
-
-    /* setup */
-    ts = terminal_settings_new();
-
-    /* obtain keyboard event */
-    usleep(1);
-    if (terminal_kbhit(&ts)) {
-        c = getch();
-        printf("--> %c\n", c);
-    } else {
-        printf(".");
-    }
-
-    /* clean up */
-    terminal_restore(&ts);
-
-    return 0;
-}
+/* int manual_control(void) */
+/* { */
+/*     char c; */
+/*     struct terminal_settings ts; */
+/*  */
+/*     #<{(| setup |)}># */
+/*     ts = terminal_settings_new(); */
+/*  */
+/*     #<{(| obtain keyboard event |)}># */
+/*     usleep(1); */
+/*     if (terminal_kbhit(&ts)) { */
+/*         c = getch(); */
+/*         printf("--> %c\n", c); */
+/*     } else { */
+/*         printf("."); */
+/*     } */
+/*  */
+/*     #<{(| clean up |)}># */
+/*     terminal_restore(&ts); */
+/*  */
+/*     return 0; */
+/* } */
 
 
 int main(void)
 {
+    log_info("setup");
+
+    i2c_setup();
     pca9685_setup();
     pca9685_set_pwm_frequency(400);
+    pca9685_set_all_pwm(80);
+    sleep(5);
+    pca9685_set_all_pwm(40);
+    sleep(5);
+    pca9685_set_all_pwm(50);
+    sleep(5);
 
     /* struct mpu6050_data data; */
     /* FILE *output_file; */
@@ -68,6 +77,6 @@ int main(void)
     /* #<{(| clean up |)}># */
     /* fclose(output_file); */
     /* i2c_teardown(); */
-
+    /*  */
     return 0;
 }

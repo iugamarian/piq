@@ -4,10 +4,14 @@
 static void pca9685_config_mode1_register(void)
 {
     char mode_1;
+    int retval;
 
     /* get mode_1 register settings */
     mode_1 = 0x0;
-    i2c_read_byte(PCA9685_MODE1, &mode_1);
+    retval = i2c_read_byte(PCA9685_MODE1, &mode_1);
+    if (retval == -1) {
+        log_err("Failed to read PCA9685 mode 1 register");
+    }
 
     /* ALLCALL: set PCA9685 to respond to LED All Call I2C-bus address */
     mode_1 |= 1 << 0;
@@ -16,7 +20,10 @@ static void pca9685_config_mode1_register(void)
     mode_1 |= 1 << 4;
 
     /* set mode_1 register settings */
-    i2c_write_byte(PCA9685_MODE1, mode_1);
+    retval = i2c_write_byte(PCA9685_MODE1, mode_1);
+    if (retval == -1) {
+        log_err("Failed to write PCA9685 mode 1 register");
+    }
 
     /* wait for oscillator */
     usleep(PCA9685_WAIT_MS);
@@ -25,16 +32,23 @@ static void pca9685_config_mode1_register(void)
 static void pca9685_config_mode2_register(void)
 {
     char mode_2;
+    int retval;
 
     /* get mode2 register settings */
     mode_2 = 0x0;
-    i2c_read_byte(PCA9685_MODE2, &mode_2);
+    retval = i2c_read_byte(PCA9685_MODE2, &mode_2);
+    if (retval == -1) {
+        log_err("Failed to read PCA9685 mode 2 register");
+    }
 
     /* OUTDRV: LEDs set to totem pole structure */
     mode_2 |= 1 << 2;
 
     /* set mode_2 register settings */
-    i2c_write_byte(PCA9685_MODE2, mode_2);
+    retval = i2c_write_byte(PCA9685_MODE2, mode_2);
+    if (retval == -1) {
+        log_err("Failed to write PCA9685 mode 2 register");
+    }
 
     /* wait for oscillator */
     usleep(PCA9685_WAIT_MS);

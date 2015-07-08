@@ -15,7 +15,7 @@ LIBS = -L/usr/local/lib -L/usr/lib -L$(LIB_DIR) -lpiq -lbcm2835 -lm
 
 
 # COMPILER FLAGS
-DEBUG_FLAGS = -g3 -gdwarf-2
+DEBUG_FLAGS = -g -gdwarf-2
 WARN_FLAGS = -Wall -Wstrict-prototypes
 
 CFLAGS = $(DEBUG_FLAGS) \
