@@ -3,11 +3,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <termios.h>
 #include <sys/time.h>
 
 
+/* MACROS */
 #define log_err(M, ...) \
     fprintf(stderr,\
         "[ERROR] (%s:%d) " M "\n",\
@@ -19,16 +21,26 @@
 #define log_info(M, ...) fprintf(stderr, "[INFO] " M "\n", ##__VA_ARGS__)
 
 
+/* DEFINES */
+#define TERMINAL_RAW_MODE 0
+#define TERMINAL_COOKED_MODE 1
+
+
 /* STRUCTURES */
 struct terminal_settings
 {
-    struct termios old;
-    struct termios new;
+    int state;
+    struct termios old_settings;
 };
 
 
 /* FUNCTIONS */
-char getch(void);
-char getche(void);
+struct terminal_settings terminal_settings_new(void);
+void terminal_cooked_mode(struct terminal_settings *ts);
+void terminal_raw_mode(struct terminal_settings *ts);
+void terminal_restore(struct terminal_settings *ts);
+int terminal_kbhit(struct terminal_settings *ts);
+int getch(void);
+int getche(void);
 
 #endif

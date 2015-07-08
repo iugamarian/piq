@@ -1,54 +1,93 @@
 #include "utils.h"
 
 
-static struct terminal_settings *init_term_io_settings(int echo)
+struct terminal_settings terminal_settings_new(void)
 {
-    struct terminal_settings *ts;
-
-    /* grab old i/o settings and make a copy */
-    ts = malloc(sizeof(struct terminal_settings));
-    tcgetattr(0, &ts->old);
-    ts->new = ts->old;
-
-    /* disable buffered i/o */
-    ts->new.c_lflag &= ~ICANON;
-
-    /* set echo mode */
-    ts->new.c_lflag &= echo ? ECHO : ~ECHO;
-
-    /* use new terminal i/o */
-    tcsetattr(0, TCSANOW, &ts->new);
-
+    struct terminal_settings ts;
+    ts.state = TERMINAL_COOKED_MODE;
     return ts;
 }
 
-static void reset_term_io_settings(struct terminal_settings *ts)
+void terminal_cooked_mode(struct terminal_settings *ts)
 {
-    /* reset new settings with old */
-    tcsetattr(0, TCSANOW, &ts->old);
+    if (ts->state == TERMINAL_RAW_MODE) {
+        tcsetattr(0, TCSANOW, &ts->old_settings);
+    }
 }
 
-static char getch_(int echo)
+void terminal_raw_mode(struct terminal_settings *ts)
 {
-    char ch;
-    struct terminal_settings *ts;
+    struct termios new_settings;
 
-    ts = init_term_io_settings(echo);
+    if (ts->state == TERMINAL_COOKED_MODE) {
+        /* put keyboard (stdin, actually) in raw, unbuffered mode */
+        tcgetattr(0, &ts->old_settings);
+        memcpy(&new_settings, &ts->old_settings, sizeof(struct termios));
+        new_settings.c_lflag &= ~(ICANON | ECHO);
+        new_settings.c_cc[VTIME] = 0;
+        new_settings.c_cc[VMIN] = 1;
+        tcsetattr(0, TCSANOW, &new_settings);
+    }
+}
+
+void terminal_restore(struct terminal_settings *ts)
+{
+    terminal_cooked_mode(ts);
+}
+
+int terminal_kbhit(struct terminal_settings *ts)
+{
+    struct timeval timeout;
+    fd_set read_handles;
+    int status;
+
+    /* setup */
+    terminal_raw_mode(ts);
+
+    /* check stdin (fd 0) for activity */
+    FD_ZERO(&read_handles);
+    FD_SET(0, &read_handles);
+    timeout.tv_sec = timeout.tv_usec = 0;
+    status = select(0 + 1, &read_handles, NULL, NULL, &timeout);
+
+    if (status < 0) {
+        printf("select() failed in kbhit()\n");
+        exit(1);
+    }
+
+    return status;
+}
+
+int getch(void)
+{
+    int ch;
+    struct termios oldattr;
+    struct termios newattr;
+
+    tcgetattr(STDIN_FILENO, &oldattr);
+    newattr = oldattr;
+    newattr.c_lflag &= ~(ICANON | ECHO);
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
     ch = getchar();
-    reset_term_io_settings(ts);
-    free(ts);
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
 
     return ch;
 }
 
-char getch(void)
+int getche(void)
 {
-    /* read 1 character without echo */
-    return getch_(0);
-}
+    int ch;
+    struct termios oldattr;
+    struct termios newattr;
 
-char getche(void)
-{
-    /* read 1 character with echo */
-    return getch_(1);
+    tcgetattr( STDIN_FILENO, &oldattr );
+    newattr = oldattr;
+    newattr.c_lflag &= ~(ICANON);
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+
+    return ch;
 }
