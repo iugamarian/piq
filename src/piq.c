@@ -32,12 +32,12 @@ int main(void)
     i2c_setup();
     pca9685_setup();
     pca9685_set_pwm_frequency(400);
-    pca9685_set_all_pwm(80);
-    sleep(5);
-    pca9685_set_all_pwm(40);
-    sleep(5);
-    pca9685_set_all_pwm(50);
-    sleep(5);
+
+    /* log_info("some throttle!"); */
+    /* pca9685_set_all_pwm(50); */
+    /* sleep(5); */
+    /*  */
+    /* pca9685_set_all_pwm(0); */
 
     /* struct mpu6050_data data; */
     /* FILE *output_file; */

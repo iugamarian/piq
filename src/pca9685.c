@@ -1,67 +1,21 @@
 #include "pca9685.h"
 
 
-static void pca9685_config_mode1_register(void)
-{
-    char mode_1;
-    int retval;
-
-    /* get mode_1 register settings */
-    mode_1 = 0x0;
-    retval = i2c_read_byte(PCA9685_MODE1, &mode_1);
-    if (retval == -1) {
-        log_err("Failed to read PCA9685 mode 1 register");
-    }
-
-    /* ALLCALL: set PCA9685 to respond to LED All Call I2C-bus address */
-    mode_1 |= 1 << 0;
-
-    /* SLEEP: set normal mode */
-    mode_1 |= 1 << 4;
-
-    /* set mode_1 register settings */
-    retval = i2c_write_byte(PCA9685_MODE1, mode_1);
-    if (retval == -1) {
-        log_err("Failed to write PCA9685 mode 1 register");
-    }
-
-    /* wait for oscillator */
-    usleep(PCA9685_WAIT_MS);
-}
-
-static void pca9685_config_mode2_register(void)
-{
-    char mode_2;
-    int retval;
-
-    /* get mode2 register settings */
-    mode_2 = 0x0;
-    retval = i2c_read_byte(PCA9685_MODE2, &mode_2);
-    if (retval == -1) {
-        log_err("Failed to read PCA9685 mode 2 register");
-    }
-
-    /* OUTDRV: LEDs set to totem pole structure */
-    mode_2 |= 1 << 2;
-
-    /* set mode_2 register settings */
-    retval = i2c_write_byte(PCA9685_MODE2, mode_2);
-    if (retval == -1) {
-        log_err("Failed to write PCA9685 mode 2 register");
-    }
-
-    /* wait for oscillator */
-    usleep(PCA9685_WAIT_MS);
-}
-
 void pca9685_setup(void)
 {
-    /* switch off all pwm channels */
-    pca9685_set_all_pwm(0);
+    char mode_1;
 
-    /* configure mode_2 and mode_1 registers: order is important here! */
-    pca9685_config_mode2_register();
-    pca9685_config_mode1_register();
+    /* configure mode 2 register */
+    i2c_set_slave(PCA9685_I2C_ADDR);
+    i2c_write_byte(PCA9685_MODE2, 0x04);
+    i2c_write_byte(PCA9685_MODE1, 0x01);
+    usleep(PCA9685_WAIT_MS);
+
+    /* configure mode 1 register */
+    i2c_read_byte(PCA9685_MODE1, &mode_1);
+    mode_1 = mode_1 & ~0x10;
+    i2c_write_byte(PCA9685_MODE1, mode_1);
+    usleep(PCA9685_WAIT_MS);
 }
 
 void pca9685_set_pwm_frequency(int freq)
@@ -70,13 +24,16 @@ void pca9685_set_pwm_frequency(int freq)
     char mode_1_old;
     char mode_1_new;
 
+    /* setup */
+    i2c_set_slave(PCA9685_I2C_ADDR);
+
     /* set pca9685 to sleep */
     i2c_read_byte(PCA9685_MODE1, &mode_1_old);
     mode_1_new = (mode_1_old & 0x7F) | 0x10;
     i2c_write_byte(PCA9685_MODE1, mode_1_new);
 
     /* set pwm prescaler */
-    prescale = (25000000 / (4996.0 / (float) freq)) - 1;
+    prescale = (25000000 / (4096.0 * freq)) - 1;
     prescale = floor(prescale + 0.5);
     i2c_write_byte(PCA9685_PRE_SCALE, prescale);
     i2c_write_byte(PCA9685_MODE1, mode_1_old);
@@ -94,8 +51,11 @@ void pca9685_set_pwm(uint8_t channel, uint8_t duty_cycle)
     uint16_t off;
 
     /* calculate on / off counts */
-    on = 4095 * (duty_cycle / 100);
-    off = 4095 - on;
+    on = 0;
+    off = (int16_t) 4095.0 * (duty_cycle / 100.0);
+
+    /* setup */
+    i2c_set_slave(PCA9685_I2C_ADDR);
 
     /* set a single PWM channel */
     i2c_set_slave(PCA9685_I2C_ADDR);
@@ -107,12 +67,15 @@ void pca9685_set_pwm(uint8_t channel, uint8_t duty_cycle)
 
 void pca9685_set_all_pwm(uint8_t duty_cycle)
 {
-    uint8_t on;
-    uint8_t off;
+    uint16_t on;
+    uint16_t off;
+
+    /* setup */
+    i2c_set_slave(PCA9685_I2C_ADDR);
 
     /* calculate on / off counts */
-    on = 4095 * (duty_cycle / 100);
-    off = 4095 - on;
+    on = 0;
+    off = (int16_t) 4096.0 * (duty_cycle / 100.0);
 
     /* sets a all PWM channels */
     i2c_set_slave(PCA9685_I2C_ADDR);
