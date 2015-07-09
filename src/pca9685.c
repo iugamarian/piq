@@ -50,6 +50,9 @@ void pca9685_set_pwm(uint8_t channel, uint8_t duty_cycle)
     uint16_t on;
     uint16_t off;
 
+    /* setup */
+    i2c_set_slave(PCA9685_I2C_ADDR);
+
     /* calculate on / off counts */
     on = 0;
     off = (int16_t) 4095.0 * (duty_cycle / 100.0);

@@ -8,8 +8,9 @@
 /* STRUCTURES */
 struct motors
 {
-    int duty_min;
-    int duty_max;
+    int frequency;
+    int min;
+    int max;
 
     int motor_1;
     int motor_2;
@@ -20,7 +21,7 @@ struct motors
 
 /* FUNCTIONS */
 struct motors motors_setup(void);
-void motors_set_throttle(struct motors *m);
+void motors_set_throttles(struct motors *m);
 
 
 

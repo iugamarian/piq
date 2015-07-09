@@ -5,6 +5,7 @@
 
 #include "i2c.h"
 #include "utils.h"
+#include "control.h"
 #include "mpu6050.h"
 #include "pca9685.h"
 
