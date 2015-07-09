@@ -27,23 +27,4 @@ install_libbcm2835()
     rm $BCM2835_FILE
 }
 
-install_pi_blaster()
-{
-    # clone pi-blaster repo
-    git clone https://github.com/sarfata/pi-blaster
-
-    # cd into repo
-    cd pi-blaster
-
-    # build and install
-    ./autogen.sh
-    ./configure
-    make
-    make install
-
-    # clean up
-    cd ..
-}
-
-# install_libbcm2835
-install_pi_blaster
+install_libbcm2835

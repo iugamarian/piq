@@ -5,8 +5,9 @@
 ## Hardware
 The project uses the following hardware:
 
-- Raspberry Pi Model B
-- MPU6050
+- Raspberry Pi Model B (On board flight computer)
+- MPU6050 (Inertia Measurement Unit)
+- PCA9685 (Electronic Speed Controller)
 
 
 ## Software Dependencies
