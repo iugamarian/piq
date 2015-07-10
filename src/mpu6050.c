@@ -93,7 +93,7 @@ static void accelerometer_calc_angle(struct mpu6050_data *data)
     z = data->accel.z;
 
     /* calculate pitch and roll */
-    data->accel.pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI ;
+    data->accel.pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
     data->accel.roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
 }
 
@@ -398,4 +398,44 @@ int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data)
     fprintf(output_file, "%f\n", data->roll);
 
     return 0;
+}
+
+void mpu6050_brief_recording(char *output_path)
+{
+    int8_t retval;
+    FILE *output_file;
+    struct mpu6050_data data;
+
+    /* setup */
+    mpu6050_setup(&data);
+    output_file = fopen(output_path, "w");
+
+    /* read values */
+    log_info("MPU6050 brief recording");
+
+    int i = 0;
+    while (1) {
+        /* get data */
+        retval = mpu6050_data(&data);
+        if (retval == -1) {
+            log_err("failed to obtain data from MPU6050!");
+            return -1;
+        }
+
+        /* record data */
+        mpu6050_record_data(output_file, &data);
+        if (retval == -1) {
+            log_err("failed to record MPU6050 data!");
+            return -1;
+        }
+
+        if (i == 10000) {
+            break;
+        }
+
+        i++;
+    }
+
+    /* clean up */
+    fclose(output_file);
 }

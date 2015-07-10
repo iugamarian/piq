@@ -3,17 +3,28 @@
 
 static void manual_control_handler(char c, struct motors *m)
 {
+    /* keyboard handler */
     if (c == 'w') {
+        log_info("increasing throttle");
         m->motor_1 += 100;
         m->motor_2 += 100;
         m->motor_3 += 100;
         m->motor_4 += 100;
 
     } else if (c == 's') {
+        log_info("decreasing throttle");
         m->motor_1 -= 100;
         m->motor_2 -= 100;
         m->motor_3 -= 100;
         m->motor_4 -= 100;
+
+    } else if (c == 'c') {
+        log_info("calibrating motors");
+        motors_calibrate(&m);
+
+    } else if (c == 'r') {
+        log_info("resetting PCA9685");
+        pca9685_reset();
 
     }
 
@@ -21,6 +32,9 @@ static void manual_control_handler(char c, struct motors *m)
     log_info("motor_2: %d", m->motor_2);
     log_info("motor_3: %d", m->motor_3);
     log_info("motor_4: %d", m->motor_4);
+
+    /* set throttle */
+    motors_set_throttles(m);
 }
 
 static int manual_control(struct motors *m)
@@ -48,54 +62,18 @@ int main(void)
 {
     struct motors m;
 
+    /* setup */
     log_info("setup");
-
     i2c_setup();
     m = motors_setup();
-    motors_set_throttles(&m);
 
+    /* events loop */
     while (1) {
         manual_control(&m);
     }
 
-    /* struct mpu6050_data data; */
-    /* FILE *output_file; */
-    /* int8_t retval; */
-    /*  */
-    /* #<{(| setup |)}># */
-    /* i2c_setup(); */
-    /* mpu6050_setup(&data); */
-    /*  */
-    /* output_file = fopen("output.dat", "w"); */
-    /*  */
-    /* #<{(| read values |)}># */
-    /* log_info("running\n"); */
-    /* int i = 0; */
-    /* while (1) { */
-    /*     #<{(| get data |)}># */
-    /*     retval = mpu6050_data(&data); */
-    /*     if (retval == -1) { */
-    /*         log_err("Failed to obtain data from MPU6050!"); */
-    /*         return -1; */
-    /*     } */
-    /*  */
-    /*     #<{(| record data |)}># */
-    /*     mpu6050_record_data(output_file, &data); */
-    /*     if (retval == -1) { */
-    /*         log_err("Failed to record MPU6050 data!"); */
-    /*         return -1; */
-    /*     } */
-    /*  */
-    /*     if (i == 10000) { */
-    /*         break; */
-    /*     } */
-    /*  */
-    /*     i++; */
-    /* } */
-    /*  */
-    /* #<{(| clean up |)}># */
-    /* fclose(output_file); */
-    /* i2c_teardown(); */
-    /*  */
+    /* clean up */
+    i2c_teardown();
+
     return 0;
 }

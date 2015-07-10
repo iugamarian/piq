@@ -19,5 +19,6 @@ int i2c_read_bytes(char reg_addr, char *data, size_t data_length);
 int i2c_read_byte(char reg_addr, char *data);
 int i2c_write_bytes(char reg_addr, char *data, size_t data_length);
 int i2c_write_byte(char reg_addr, uint8_t byte);
+int i2c_write_raw_byte(uint8_t byte);
 
 #endif

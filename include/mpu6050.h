@@ -206,5 +206,7 @@ int8_t mpu6050_get_accel_range(void);
 int8_t mpu6050_set_accel_range(int8_t);
 void mpu6050_info(struct mpu6050_data *data);
 int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data);
+void mpu6050_brief_recording(char *output_path);
+
 
 #endif

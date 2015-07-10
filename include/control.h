@@ -21,6 +21,7 @@ struct motors
 
 /* FUNCTIONS */
 struct motors motors_setup(void);
+void motors_calibrate(struct motors *m);
 void motors_set_throttles(struct motors *m);
 
 

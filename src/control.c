@@ -16,6 +16,7 @@ struct motors motors_setup(void)
     m.min = (int) 4096.0 * duty_min;
     m.max = (int) 4096.0 * duty_max;
 
+    log_info("frequency: %d", m.frequency);
     log_info("duty min: %f", duty_min);
     log_info("duty max: %f", duty_max);
     log_info("min: %d", m.min);
@@ -28,10 +29,28 @@ struct motors motors_setup(void)
     m.motor_4 = m.min + 100;
 
     /* setup pca9685 */
+    pca9685_set_all_pwm(0);
+    pca9685_reset();
+    sleep(5);
+
     pca9685_setup();
     pca9685_set_pwm_frequency(m.frequency);
 
+    log_info("calibrate");
+    motors_calibrate(&m);
+
     return m;
+}
+
+void motors_calibrate(struct motors *m)
+{
+    log_info("calibrate high");
+    pca9685_set_all_pwm(m->min + 100);
+    sleep(3);
+
+    log_info("calibrate low");
+    pca9685_set_all_pwm(m->max - 100);
+    sleep(3);
 }
 
 void motors_set_throttles(struct motors *m)

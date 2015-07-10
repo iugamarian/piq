@@ -103,3 +103,20 @@ int i2c_write_byte(char reg_addr, uint8_t byte)
 
     return 0;
 }
+
+int i2c_write_raw_byte(uint8_t byte)
+{
+    char data[1];
+    bcm2835I2CReasonCodes retval;
+
+    /* setup */
+    data[0] = byte;
+
+    /* write byte */
+    retval = bcm2835_i2c_write(data, 1);
+    if (retval != BCM2835_I2C_REASON_OK) {
+        return -1;
+    }
+
+    return 0;
+}
