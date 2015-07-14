@@ -6,24 +6,22 @@
 
 
 /* STRUCTURES */
-struct motors
+struct esc
 {
     int frequency;
     int min;
     int max;
 
-    int motor_1;
-    int motor_2;
-    int motor_3;
-    int motor_4;
+    int16_t motor_1;
+    int16_t motor_2;
+    int16_t motor_3;
+    int16_t motor_4;
 };
 
 
 /* FUNCTIONS */
-struct motors motors_setup(void);
-void motors_calibrate(struct motors *m);
-void motors_set_throttles(struct motors *m);
-
-
+struct esc *esc_setup(void);
+void esc_calibrate(struct esc *e);
+void esc_set_throttles(struct esc *e);
 
 #endif

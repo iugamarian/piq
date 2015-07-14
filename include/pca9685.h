@@ -95,10 +95,10 @@
 
 
 /* FUNCTIONS */
-void pca9685_setup(void);
+void pca9685_setup(int freq);
 void pca9685_set_pwm_frequency(int freq);
-void pca9685_set_pwm(uint8_t channel, uint16_t off);
-void pca9685_set_all_pwm(uint16_t off);
+void pca9685_set_pwm(int8_t channel, int16_t off);
+void pca9685_set_all_pwm(int16_t off);
 void pca9685_reset(void);
 
 #endif

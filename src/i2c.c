@@ -7,7 +7,7 @@ int i2c_setup(void)
 
     retval = bcm2835_init();
     if (retval == 0) {
-        printf("%s\n", I2C_INIT_FAILED);
+        log_info("%s", I2C_INIT_FAILED);
         return -1;
     }
     bcm2835_i2c_begin();
@@ -86,7 +86,7 @@ int i2c_write_bytes(char reg_addr, char *data, size_t data_length)
     return 0;
 }
 
-int i2c_write_byte(char reg_addr, uint8_t byte)
+int i2c_write_byte(char reg_addr, char byte)
 {
     char data[2];
     bcm2835I2CReasonCodes retval;

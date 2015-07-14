@@ -424,6 +424,7 @@ int mpu6050_brief_recording(char *output_path)
 
         /* record data */
         mpu6050_record_data(output_file, &data);
+
         if (retval == -1) {
             log_err("failed to record MPU6050 data!");
             return -1;

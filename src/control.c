@@ -1,62 +1,58 @@
 #include "control.h"
 
 
-struct motors motors_setup(void)
+struct esc *esc_setup(void)
 {
-    struct motors m;
+    struct esc *e;
     float duty_min;
     float duty_max;
 
+    /* setup */
+    e = malloc(sizeof(struct esc));
+
     /* calculate min / max duty cycle */
-    m.frequency = 400;
-    duty_min = (0.001 / (1.0 / (float) m.frequency));
-    duty_max = (0.002 / (1.0 / (float) m.frequency));
+    e->frequency = 400;
+    duty_min = (0.001 / (1.0 / (float) e->frequency));
+    duty_max = (0.002 / (1.0 / (float) e->frequency));
 
     /* calculate PCA9685 motor bounds - out of 4095 */
-    m.min = (int) 4096.0 * duty_min;
-    m.max = (int) 4096.0 * duty_max;
+    e->min = (int) 4096.0 * duty_min;
+    e->max = (int) 4096.0 * duty_max;
 
-    log_info("frequency: %d", m.frequency);
+    log_info("frequency: %d", e->frequency);
     log_info("duty min: %f", duty_min);
     log_info("duty max: %f", duty_max);
-    log_info("min: %d", m.min);
-    log_info("max: %d", m.max);
+    log_info("min: %d", e->min);
+    log_info("max: %d", e->max);
 
     /* set motor defaults */
-    m.motor_1 = m.min + 100;
-    m.motor_2 = m.min + 100;
-    m.motor_3 = m.min + 100;
-    m.motor_4 = m.min + 100;
+    e->motor_1 = e->min + 100;
+    e->motor_2 = e->min + 100;
+    e->motor_3 = e->min + 100;
+    e->motor_4 = e->min + 100;
 
     /* setup pca9685 */
-    pca9685_set_all_pwm(0);
-    pca9685_reset();
-    sleep(5);
+    pca9685_setup(e->frequency);
+    sleep(1);
 
-    pca9685_setup();
-    pca9685_set_pwm_frequency(m.frequency);
-
-    log_info("calibrate");
-    motors_calibrate(&m);
-
-    return m;
+    return e;
 }
 
-void motors_calibrate(struct motors *m)
+void esc_calibrate(struct esc *e)
 {
     log_info("calibrate high");
-    pca9685_set_all_pwm(m->min + 100);
+    pca9685_set_all_pwm(e->max - 100);
     sleep(3);
 
     log_info("calibrate low");
-    pca9685_set_all_pwm(m->max - 100);
+    pca9685_set_all_pwm(e->min + 100);
     sleep(3);
 }
 
-void motors_set_throttles(struct motors *m)
+void esc_set_throttles(struct esc *e)
 {
-    pca9685_set_pwm(1, m->motor_1);
-    pca9685_set_pwm(2, m->motor_2);
-    pca9685_set_pwm(3, m->motor_3);
-    pca9685_set_pwm(4, m->motor_4);
+    pca9685_set_pwm(0, e->motor_1);
+    pca9685_set_pwm(1, e->motor_2);
+    pca9685_set_pwm(2, e->motor_3);
+    pca9685_set_pwm(3, e->motor_4);
 }

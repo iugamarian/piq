@@ -6,6 +6,8 @@
 
 #include <bcm2835.h>
 
+#include "utils.h"
+
 
 /* ERROR MESSAGES */
 #define I2C_INIT_FAILED "failed to initialize I2C!"
@@ -18,7 +20,7 @@ void i2c_set_slave(char slave_addr);
 int i2c_read_bytes(char reg_addr, char *data, size_t data_length);
 int i2c_read_byte(char reg_addr, char *data);
 int i2c_write_bytes(char reg_addr, char *data, size_t data_length);
-int i2c_write_byte(char reg_addr, uint8_t byte);
+int i2c_write_byte(char reg_addr, char byte);
 int i2c_write_raw_byte(uint8_t byte);
 
 #endif
