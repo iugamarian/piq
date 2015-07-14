@@ -400,7 +400,7 @@ int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data)
     return 0;
 }
 
-void mpu6050_brief_recording(char *output_path)
+int mpu6050_brief_recording(char *output_path)
 {
     int8_t retval;
     FILE *output_file;
@@ -438,4 +438,6 @@ void mpu6050_brief_recording(char *output_path)
 
     /* clean up */
     fclose(output_file);
+
+    return 0;
 }

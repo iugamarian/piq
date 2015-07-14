@@ -20,7 +20,7 @@ static void manual_control_handler(char c, struct motors *m)
 
     } else if (c == 'c') {
         log_info("calibrating motors");
-        motors_calibrate(&m);
+        motors_calibrate(m);
 
     } else if (c == 'r') {
         log_info("resetting PCA9685");
