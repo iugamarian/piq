@@ -71,48 +71,28 @@ static int manual_control(struct esc *m)
     return quit;
 }
 
-static int telemetry_loop(void)
-{
-    int retval;
-    struct telemetry *t;
-
-    t = telemetry_new(NULL, NULL);
-    retval = telemetry_setup(t, "localhost", 8000);
-    check(retval == 0, "failed to connect to server @ localhost");
-
-    while (1) {
-        if (tcp_client_send(t->client, "YES!\n") == -1) {
-            break;
-        }
-        log_info("GOT: %s", tcp_client_recv(t->client));
-    }
-
-    log_info("server disconected!");
-
-error:
-    return -1;
-}
 
 int main(void)
 {
-    int quit;
-    struct esc *e;
-
-    /* setup */
-    log_info("setup");
-    i2c_setup();
-    e = esc_setup();
-
-    /* events loop */
-    while (1) {
-        quit = manual_control(e);
-        if (quit) {
-            break;
-        }
-    }
-
-    /* clean up */
-    i2c_teardown();
+    telemetry_loop();
+    /* int quit; */
+    /* struct esc *e; */
+    /*  */
+    /* #<{(| setup |)}># */
+    /* log_info("setup"); */
+    /* i2c_setup(); */
+    /* e = esc_setup(); */
+    /*  */
+    /* #<{(| events loop |)}># */
+    /* while (1) { */
+    /*     quit = manual_control(e); */
+    /*     if (quit) { */
+    /*         break; */
+    /*     } */
+    /* } */
+    /*  */
+    /* #<{(| clean up |)}># */
+    /* i2c_teardown(); */
 
     return 0;
 }
