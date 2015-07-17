@@ -20,6 +20,27 @@
 #define log_warn(M, ...) fprintf(stderr, "[WARN] " M "\n", ##__VA_ARGS__)
 #define log_info(M, ...) fprintf(stderr, "[INFO] " M "\n", ##__VA_ARGS__)
 
+#define check(A, M, ...) \
+    if (!(A)) { \
+        log_err(M, ##__VA_ARGS__); \
+        goto error; \
+    }
+#define check_mem(A) check((A), "out of memory.")
+#define check_debug(A, M, ...) \
+    if (!(A)) { \
+        debug(M, ##__VA_ARGS__); \
+        goto error; \
+    }
+#define silent_check(A) \
+    if (!(A)) { \
+        goto error; \
+    }
+
+#define free_mem(TARGET, FREE_FUNC) \
+    if (TARGET) { \
+        FREE_FUNC((void *) TARGET); \
+    }
+
 
 /* DEFINES */
 #define TERMINAL_RAW_MODE 0
