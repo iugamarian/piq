@@ -42,38 +42,33 @@ static int tcp_client_setup(struct tcp_client *c)
     check(c->host != NULL, "tcp_client->host is NULL!");
     check(c->socket == -1, "tcp_client->socket is set!");
 
-    if (c->protocol == IPV4) {
-        /* create socket */
-        c->socket = socket(AF_INET, SOCK_STREAM, 0);
-        check(c->socket >= 0, "failed to create TCP socket");
+    /* create socket */
+    c->socket = socket(AF_INET, SOCK_STREAM, 0);
+    check(c->socket >= 0, "failed to create TCP socket");
 
-        /* socket address */
-        memset(&sock_ipv4, '0', sizeof(sock_ipv4));
+    /* socket address */
+    memset(&sock_ipv4, '0', sizeof(sock_ipv4));
 
-        sock_ipv4.sin_family = AF_INET;
-        sock_ipv4.sin_port = htons((uint16_t) c->port);
-        c->ip = hostname_to_ip(c->host);
-        retval = inet_pton(AF_INET, c->ip, &sock_ipv4.sin_addr);
+    sock_ipv4.sin_family = AF_INET;
+    sock_ipv4.sin_port = htons((uint16_t) c->port);
+    c->ip = hostname_to_ip(c->host);
+    retval = inet_pton(AF_INET, c->ip, &sock_ipv4.sin_addr);
 
-        retval = connect(
-            c->socket,
-            (struct sockaddr *) &sock_ipv4,
-            sizeof(sock_ipv4)
-        );
-        check(retval >= 0, "failed to connect to server");
-
-    } else if (c->protocol == IPV6) {
-        log_err("IPV6 is not supported!");
-        return -1;
-
-    } else {
-        return -1;
-
-    }
+    retval = connect(
+        c->socket,
+        (struct sockaddr *) &sock_ipv4,
+        sizeof(sock_ipv4)
+    );
+    check(retval >= 0, "failed to connect to server");
 
     return 0;
+
 error:
-    return -1;
+    if (c->socket >= 0) {
+        return -1;
+    } else {
+        return -2;
+    }
 }
 
 struct tcp_client *tcp_client_new(const char *host, const int port)
@@ -137,31 +132,55 @@ error:
     return NULL;
 }
 
-int telemetry_loop(void)
-{
-    struct tcp_client *client;
-    char *msg;
 
-    client = tcp_client_new("localhost", 8000);
+int telemetry_loop(struct mpu6050_data *data)
+{
+    char *host;
+    int port;
+    char *msg;
+    char buf[100];
+    struct tcp_client *client;
+
+    /* setup */
+    host = "localhost";
+    port = 8000;
+
+    client = tcp_client_new(host, port);
     silent_check(client != NULL);
 
-    log_info("connected to localhost!");
+    log_info("connected to %s!", host);
     while (1) {
+        /* setup */
+        memset(buf, '\0', 100);
+        sprintf(buf, "%f %f", 10.0f, 10.0f);
+
         /* send */
-        if (tcp_client_send(client, "YES!\n") == -1) {
+        if (tcp_client_send(client, buf) == -1) {
             break;
         }
 
         /* receive */
         msg = tcp_client_recv(client);
-        if (msg == NULL) {
-            break;
-        } else {
-            log_info("received: %s", msg);
+        if (strcmp(msg, "w") == 0) {
+            log_info("throttle up: %s", msg);
             free(msg);
+
+        } else if (strcmp(msg, "d") == 0) {
+            log_info("throttle down: %s", msg);
+            free(msg);
+
+        } else if (strcmp(msg, "q") == 0) {
+            log_info("quit!");
+            free(msg);
+            break;
+
+        } else {
+            free(msg);
+
         }
     }
-    log_info("disconnected from localhost!");
+    log_info("disconnected from %s!", host);
+    close(client->socket);
 
     return 0;
 error:

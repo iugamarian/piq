@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+
 #include "utils.h"
 #include "mpu6050.h"
 
@@ -38,6 +39,6 @@ struct tcp_client *tcp_client_new(const char *host, const int port);
 void tcp_client_destroy(void *target);
 int tcp_client_send(struct tcp_client *c, const char *msg);
 char *tcp_client_recv(struct tcp_client *c);
-int telemetry_loop(void);
+int telemetry_loop(struct mpu6050_data *data);
 
 #endif

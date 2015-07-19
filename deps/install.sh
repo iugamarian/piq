@@ -27,4 +27,18 @@ install_libbcm2835()
     rm $BCM2835_FILE
 }
 
-install_libbcm2835
+install_libwsclient()
+{
+    # download libwsclient
+    rm -rf libwsclient
+    git clone https://github.com/payden/libwsclient.git
+
+    # build
+    cd libwsclient
+    libtoolize && ./autogen.sh
+    ./configure && make && sudo make install
+
+}
+
+# install_libbcm2835
+install_libwsclient
