@@ -1,37 +1,6 @@
 #include "telemetry.h"
 
 
-static char *hostname_to_ip(char *hostname)
-{
-    int retval;
-    char *ip;
-    struct addrinfo hints;
-    struct addrinfo *servinfo;
-    struct addrinfo *p;
-    struct sockaddr_in *h;
-
-    /* hints */
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;  /* use AF_INET6 to force IPv6 */
-    hints.ai_socktype = SOCK_STREAM;
-
-    /* get addrinfo */
-    retval = getaddrinfo(hostname , "http" , &hints , &servinfo);
-    check(retval == 0, "getaddrinfo: %s\n", gai_strerror(retval));
-
-    /* loop through results and connect to the first we can */
-    ip = malloc(sizeof(char) * INET_ADDRSTRLEN);
-    for (p = servinfo; p != NULL; p = p->ai_next) {
-        h = (struct sockaddr_in *) p->ai_addr;
-        inet_ntop(AF_INET, &(h->sin_addr), ip, INET_ADDRSTRLEN);
-    }
-    freeaddrinfo(servinfo);
-
-    return ip;
-error:
-    return NULL;
-}
-
 static int tcp_client_setup(struct tcp_client *c)
 {
     int retval;
@@ -39,27 +8,27 @@ static int tcp_client_setup(struct tcp_client *c)
 
     /* pre-check */
     check(c != NULL, "TCP client is NULL!");
-    check(c->host != NULL, "tcp_client->host is NULL!");
-    check(c->socket == -1, "tcp_client->socket is set!");
+    check(c->ip != NULL, "tcp_client->ip is NULL!");
+    check(c->socket == -1, "tcp_client->socket is already set!");
 
     /* create socket */
     c->socket = socket(AF_INET, SOCK_STREAM, 0);
-    check(c->socket >= 0, "failed to create TCP socket");
+    check(c->socket >= 0, "failed to create TCP socket!");
 
     /* socket address */
     memset(&sock_ipv4, '0', sizeof(sock_ipv4));
 
     sock_ipv4.sin_family = AF_INET;
     sock_ipv4.sin_port = htons((uint16_t) c->port);
-    c->ip = hostname_to_ip(c->host);
     retval = inet_pton(AF_INET, c->ip, &sock_ipv4.sin_addr);
+    check(retval == 1, "invalid ip addr!");
 
     retval = connect(
         c->socket,
         (struct sockaddr *) &sock_ipv4,
         sizeof(sock_ipv4)
     );
-    check(retval >= 0, "failed to connect to server");
+    check(retval == 0, "failed to connect to server! %s", strerror(errno));
 
     return 0;
 
@@ -71,16 +40,15 @@ error:
     }
 }
 
-struct tcp_client *tcp_client_new(const char *host, const int port)
+struct tcp_client *tcp_client_new(const char *ip, const int port)
 {
     int retval;
     struct tcp_client *c;
 
     c = malloc(sizeof(struct tcp_client));
 
-    c->ip = NULL;
-    c->host = malloc(sizeof(char) * (strlen(host) + 1));
-    strcpy(c->host, host);
+    c->ip = malloc(sizeof(char) * (strlen(ip) + 1));
+    strcpy(c->ip, ip);
     c->port = port;
     c->protocol = IPV4;
     c->socket = -1;
@@ -100,7 +68,6 @@ void tcp_client_destroy(void *target)
 
     silent_check(c);
     free_mem(c->ip, free);
-    free_mem(c->host, free);
     if (c->socket >= 0) {
         close(c->socket);
     }
@@ -135,24 +102,26 @@ error:
 
 int telemetry_loop(struct mpu6050_data *data)
 {
-    char *host;
+    char *ip;
     int port;
     char *msg;
     char buf[100];
     struct tcp_client *client;
 
     /* setup */
-    host = "localhost";
+    ip = "10.0.0.13";
     port = 8000;
 
-    client = tcp_client_new(host, port);
+    client = tcp_client_new(ip, port);
     silent_check(client != NULL);
+    log_info("connected to %s!", ip);
+    mpu6050_setup(data);
 
-    log_info("connected to %s!", host);
     while (1) {
         /* setup */
+        mpu6050_data(data);
         memset(buf, '\0', 100);
-        sprintf(buf, "%f %f", 10.0f, 10.0f);
+        sprintf(buf, "%f %f", data->pitch, data->roll);
 
         /* send */
         if (tcp_client_send(client, buf) == -1) {
@@ -179,7 +148,7 @@ int telemetry_loop(struct mpu6050_data *data)
 
         }
     }
-    log_info("disconnected from %s!", host);
+    log_info("disconnected from %s!", ip);
     close(client->socket);
 
     return 0;

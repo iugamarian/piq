@@ -178,8 +178,8 @@ struct accelerometer
 
 struct mpu6050_data
 {
-    struct gyroscope gyro;
-    struct accelerometer accel;
+    struct gyroscope *gyro;
+    struct accelerometer *accel;
 
     float temperature;
     int16_t sample_rate;

@@ -74,9 +74,20 @@
 
 int main(void)
 {
+    struct mpu6050_data *data;
+
     /* setup */
     log_info("setup");
-    telemetry_loop(NULL);
+    i2c_setup();
+
+    data = malloc(sizeof(struct mpu6050_data));
+    data->gyro = malloc(sizeof(struct gyroscope));
+    data->accel = malloc(sizeof(struct accelerometer));
+
+    /* mpu6050_setup(&data); */
+    telemetry_loop(data);
+
+    i2c_teardown();
 
     return 0;
 }

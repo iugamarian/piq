@@ -27,7 +27,6 @@
 struct tcp_client
 {
     char *ip;
-    char *host;
     int port;
     int protocol;
     int socket;
