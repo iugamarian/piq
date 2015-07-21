@@ -1,6 +1,27 @@
 #include "mpu6050.h"
 
 
+struct mpu6050_data *mpu6050_new(void)
+{
+    struct mpu6050_data *data;
+
+    data = malloc(sizeof(struct mpu6050_data));
+    data->gyro = malloc(sizeof(struct gyroscope));
+    data->accel = malloc(sizeof(struct accelerometer));
+    data->state = 1;
+
+    return data;
+}
+
+void mpu6050_destroy(void *target)
+{
+    struct mpu6050_data *data;
+    data = target;
+    free(data->gyro);
+    free(data->accel);
+    free(data);
+}
+
 int8_t mpu6050_setup(struct mpu6050_data *data)
 {
     int8_t retval;

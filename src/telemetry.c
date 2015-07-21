@@ -100,26 +100,27 @@ error:
 }
 
 
-int telemetry_loop(struct mpu6050_data *data)
+void *telemetry_loop(void *arg)
 {
     char *ip;
     int port;
     char *msg;
+    int *retval;
     char buf[100];
     struct tcp_client *client;
+    struct mpu6050_data *data;
 
     /* setup */
     ip = "10.0.0.13";
     port = 8000;
+    data = arg;
 
     client = tcp_client_new(ip, port);
     silent_check(client != NULL);
     log_info("connected to %s!", ip);
-    mpu6050_setup(data);
 
-    while (1) {
+    while (data->state) {
         /* setup */
-        mpu6050_data(data);
         memset(buf, '\0', 100);
         sprintf(buf, "%f %f", data->pitch, data->roll);
 
@@ -139,7 +140,8 @@ int telemetry_loop(struct mpu6050_data *data)
             free(msg);
 
         } else if (strcmp(msg, "q") == 0) {
-            log_info("quit!");
+            data->state = 0;
+            log_info("quit telemetry loop!");
             free(msg);
             break;
 
@@ -147,11 +149,17 @@ int telemetry_loop(struct mpu6050_data *data)
             free(msg);
 
         }
+
+        usleep(100);
     }
     log_info("disconnected from %s!", ip);
     close(client->socket);
 
-    return 0;
+    retval = malloc(sizeof(int));
+    *retval = 0;
+    return retval;
 error:
-    return -1;
+    retval = malloc(sizeof(int));
+    *retval = -1;
+    return retval;
 }

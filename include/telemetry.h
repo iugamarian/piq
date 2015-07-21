@@ -38,6 +38,6 @@ struct tcp_client *tcp_client_new(const char *host, const int port);
 void tcp_client_destroy(void *target);
 int tcp_client_send(struct tcp_client *c, const char *msg);
 char *tcp_client_recv(struct tcp_client *c);
-int telemetry_loop(struct mpu6050_data *data);
+void *telemetry_loop(void *arg);
 
 #endif

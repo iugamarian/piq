@@ -71,22 +71,39 @@
 /*     return quit; */
 /* } */
 
+static void *test_loop(void *arg)
+{
+    struct mpu6050_data *data;
+
+    data = arg;
+    while (data->state) {
+        mpu6050_data(data);
+    }
+
+    return NULL;
+}
+
 
 int main(void)
 {
     struct mpu6050_data *data;
+    pthread_t thread_1;
+    pthread_t thread_2;
 
     /* setup */
     log_info("setup");
     i2c_setup();
+    data = mpu6050_new();
+    mpu6050_setup(data);
 
-    data = malloc(sizeof(struct mpu6050_data));
-    data->gyro = malloc(sizeof(struct gyroscope));
-    data->accel = malloc(sizeof(struct accelerometer));
+    /* threading */
+    pthread_create(&thread_1, NULL, &telemetry_loop, (void *) data);
+    pthread_create(&thread_2, NULL, &test_loop, (void *) data);
+    pthread_join(thread_1, NULL);
+    pthread_join(thread_2, NULL);
 
-    /* mpu6050_setup(&data); */
-    telemetry_loop(data);
-
+    /* teardown */
+    mpu6050_destroy(data);
     i2c_teardown();
 
     return 0;

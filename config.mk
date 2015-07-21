@@ -11,7 +11,7 @@ LIB_DIR = $(PWD)/lib
 
 # INCLUDE AND LIBRARY PATHS
 INCLUDES = -I$(PWD)/include -I/usr/local/include/
-LIBS = -L/usr/local/lib -L/usr/lib -L$(LIB_DIR) -lpiq -lbcm2835 -lm
+LIBS = -L/usr/local/lib -L/usr/lib -L$(LIB_DIR) -lpiq -lbcm2835 -lm -lpthread
 
 
 # COMPILER FLAGS
