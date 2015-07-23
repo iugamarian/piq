@@ -108,49 +108,52 @@ void *telemetry_loop(void *arg)
     int *retval;
     char buf[100];
     struct tcp_client *client;
-    struct mpu6050_data *data;
+    struct piq *p;
 
     /* setup */
     ip = "10.0.0.13";
     port = 8000;
-    data = arg;
+    p = arg;
 
     client = tcp_client_new(ip, port);
     silent_check(client != NULL);
     log_info("connected to %s!", ip);
 
-    while (data->state) {
+    while (p->imu->state) {
         /* setup */
         memset(buf, '\0', 100);
-        sprintf(buf, "%f %f", data->pitch, data->roll);
+        sprintf(buf, "%f %f", p->imu->pitch, p->imu->roll);
 
         /* send */
         if (tcp_client_send(client, buf) == -1) {
+            printf("sent %s\n", buf);
             break;
         }
 
         /* receive */
         msg = tcp_client_recv(client);
-        if (strcmp(msg, "w") == 0) {
-            log_info("throttle up: %s", msg);
-            free(msg);
+        if (strcmp(msg, ".") == 0) {
+            // do nothing
+
+        } else if (strcmp(msg, "w") == 0) {
+            log_info("throttle up");
 
         } else if (strcmp(msg, "d") == 0) {
-            log_info("throttle down: %s", msg);
-            free(msg);
+            log_info("throttle down");
 
         } else if (strcmp(msg, "q") == 0) {
-            data->state = 0;
+            p->imu->state = 0;
             log_info("quit telemetry loop!");
-            free(msg);
             break;
-
-        } else {
-            free(msg);
 
         }
 
-        usleep(100);
+        if (msg) {
+            free(msg);
+            msg = NULL;
+        }
+
+        /* usleep(100); */
     }
     log_info("disconnected from %s!", ip);
     close(client->socket);

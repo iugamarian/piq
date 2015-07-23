@@ -1,34 +1,19 @@
 #include "mpu6050.h"
 
 
-struct mpu6050_data *mpu6050_new(void)
+struct mpu6050_data *mpu6050_setup(void)
 {
+    int8_t retval;
     struct mpu6050_data *data;
+
+    /* setup */
+    log_info("initializing mpu6050");
+    i2c_set_slave(MPU6050_ADDRESS);
 
     data = malloc(sizeof(struct mpu6050_data));
     data->gyro = malloc(sizeof(struct gyroscope));
     data->accel = malloc(sizeof(struct accelerometer));
     data->state = 1;
-
-    return data;
-}
-
-void mpu6050_destroy(void *target)
-{
-    struct mpu6050_data *data;
-    data = target;
-    free(data->gyro);
-    free(data->accel);
-    free(data);
-}
-
-int8_t mpu6050_setup(struct mpu6050_data *data)
-{
-    int8_t retval;
-
-    /* setup */
-    log_info("initializing mpu6050");
-    i2c_set_slave(MPU6050_ADDRESS);
 
     /* set intial values */
     data->gyro->offset_x = 0;
@@ -86,7 +71,16 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
     /* calibrate mpu6050 */
     /* mpu6050_calibrate(data); */
 
-    return 0;
+    return data;
+}
+
+void mpu6050_destroy(void *target)
+{
+    struct mpu6050_data *data;
+    data = target;
+    free(data->gyro);
+    free(data->accel);
+    free(data);
 }
 
 int8_t mpu6050_ping(void)
@@ -426,10 +420,10 @@ int mpu6050_brief_recording(char *output_path)
 {
     int8_t retval;
     FILE *output_file;
-    struct mpu6050_data data;
+    struct mpu6050_data *data;
 
     /* setup */
-    mpu6050_setup(&data);
+    data = mpu6050_setup();
     output_file = fopen(output_path, "w");
 
     /* read values */
@@ -438,14 +432,14 @@ int mpu6050_brief_recording(char *output_path)
     int i = 0;
     while (1) {
         /* get data */
-        retval = mpu6050_data(&data);
+        retval = mpu6050_data(data);
         if (retval == -1) {
             log_err("failed to obtain data from MPU6050!");
             return -1;
         }
 
         /* record data */
-        mpu6050_record_data(output_file, &data);
+        mpu6050_record_data(output_file, data);
 
         if (retval == -1) {
             log_err("failed to record MPU6050 data!");
@@ -460,6 +454,7 @@ int mpu6050_brief_recording(char *output_path)
     }
 
     /* clean up */
+    mpu6050_destroy(data);
     fclose(output_file);
 
     return 0;

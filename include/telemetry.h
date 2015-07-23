@@ -16,6 +16,7 @@
 
 #include "utils.h"
 #include "mpu6050.h"
+#include "piq.h"
 
 
 /* DEFINES */

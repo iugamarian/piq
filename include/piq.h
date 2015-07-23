@@ -13,4 +13,18 @@
 #include "telemetry.h"
 
 
+/* STRUCTURES */
+struct piq
+{
+    struct mpu6050_data *imu;
+    struct esc *motors;
+};
+
+
+/* FUNCTIONS */
+void *mpu6050_loop(void *arg);
+struct piq *piq_setup(void);
+void piq_destroy(void *target);
+
+
 #endif

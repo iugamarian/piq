@@ -194,9 +194,8 @@ struct mpu6050_data
 
 
 /* FUNCTIONS */
-struct mpu6050_data *mpu6050_new(void);
+struct mpu6050_data *mpu6050_setup(void);
 void mpu6050_destroy(void *target);
-int8_t mpu6050_setup(struct mpu6050_data *data);
 int8_t mpu6050_ping(void);
 int8_t mpu6050_data(struct mpu6050_data *data);
 int8_t mpu6050_calibrate(struct mpu6050_data *data);
