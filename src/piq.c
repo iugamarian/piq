@@ -46,7 +46,7 @@ int main(void)
 
     /* thread telemetry and mpu6050 */
     pthread_create(&thread_1, NULL, &mpu6050_loop, (void *) p);
-    pthread_create(&thread_2, NULL, &telemetry_loop, (void *) p);
+    pthread_create(&thread_2, NULL, &comms_loop, (void *) p);
     pthread_join(thread_1, NULL);
     pthread_join(thread_2, NULL);
 

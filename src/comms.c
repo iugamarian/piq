@@ -1,4 +1,4 @@
-#include "telemetry.h"
+#include "comms.h"
 
 
 static int tcp_client_setup(struct tcp_client *c)
@@ -28,7 +28,7 @@ static int tcp_client_setup(struct tcp_client *c)
         (struct sockaddr *) &sock_ipv4,
         sizeof(sock_ipv4)
     );
-    check(retval == 0, "failed to connect to server! %s", strerror(errno));
+    check(retval == 0, "failed to connect to %s", c->ip);
 
     return 0;
 
@@ -83,29 +83,12 @@ int tcp_client_send(struct tcp_client *c, const char *msg)
     return write(c->socket, msg, strlen(msg));
 }
 
-char *tcp_client_recv(struct tcp_client *c)
-{
-    size_t read_size;
-    char msg[100];
-    char *retval;
-
-    read_size = read(c->socket, msg, 100);
-    silent_check(read_size > 0);
-    retval = malloc(sizeof(char) * (strlen(msg) + 1));
-    strcpy(retval, msg);
-
-    return retval;
-error:
-    return NULL;
-}
-
-
-void *telemetry_loop(void *arg)
+void *comms_loop(void *arg)
 {
     char *ip;
     int port;
-    char *msg;
     int *retval;
+    size_t read_size;
     char buf[100];
     struct tcp_client *client;
     struct piq *p;
@@ -122,38 +105,55 @@ void *telemetry_loop(void *arg)
     while (p->imu->state) {
         /* setup */
         memset(buf, '\0', 100);
-        sprintf(buf, "%f %f", p->imu->pitch, p->imu->roll);
+        sprintf(
+            buf,
+            "%f %f %d %d %d %d",
+            p->imu->pitch,
+            p->imu->roll,
+            p->motors->motor_1,
+            p->motors->motor_2,
+            p->motors->motor_3,
+            p->motors->motor_4
+        );
 
         /* send */
         if (tcp_client_send(client, buf) == -1) {
-            printf("sent %s\n", buf);
             break;
         }
 
         /* receive */
-        msg = tcp_client_recv(client);
-        if (strcmp(msg, ".") == 0) {
+        memset(buf, '\0', 100);
+        read_size = read(client->socket, buf, 100);
+        check(read_size > 0, "failed to read from server!");
+        if (strcmp(buf, ".") == 0) {
             // do nothing
 
-        } else if (strcmp(msg, "w") == 0) {
+        } else if (strcmp(buf, "w") == 0) {
             log_info("throttle up");
+            p->motors->motor_1 += 100;
+            p->motors->motor_2 += 100;
+            p->motors->motor_3 += 100;
+            p->motors->motor_4 += 100;
+            esc_set_throttles(p->motors);
 
-        } else if (strcmp(msg, "d") == 0) {
+        } else if (strcmp(buf, "s") == 0) {
             log_info("throttle down");
+            p->motors->motor_1 -= 100;
+            p->motors->motor_2 -= 100;
+            p->motors->motor_3 -= 100;
+            p->motors->motor_4 -= 100;
+            esc_set_throttles(p->motors);
 
-        } else if (strcmp(msg, "q") == 0) {
+        } else if (strcmp(buf, "r") == 0) {
+            log_info("reset pca9685");
+            pca9685_reset();
+
+        } else if (strcmp(buf, "q") == 0) {
             p->imu->state = 0;
             log_info("quit telemetry loop!");
             break;
 
         }
-
-        if (msg) {
-            free(msg);
-            msg = NULL;
-        }
-
-        /* usleep(100); */
     }
     log_info("disconnected from %s!", ip);
     close(client->socket);
@@ -162,6 +162,7 @@ void *telemetry_loop(void *arg)
     *retval = 0;
     return retval;
 error:
+    p->imu->state = 0;
     retval = malloc(sizeof(int));
     *retval = -1;
     return retval;

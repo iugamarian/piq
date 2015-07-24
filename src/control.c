@@ -58,6 +58,18 @@ void esc_calibrate(struct esc *e)
 
 void esc_set_throttles(struct esc *e)
 {
+    /*
+        e->motor_1 = e->motor_1 + rollpid;
+        e->motor_2 = e->motor_2 + pitchpid;
+        e->motor_3 = e->motor_3 - rollpid;
+        e->motor_4 = e->motor_4 - pitchpid;
+    */
+
+    log_info("throttle_1: %d", e->motor_1);
+    log_info("throttle_2: %d", e->motor_2);
+    log_info("throttle_3: %d", e->motor_3);
+    log_info("throttle_4: %d", e->motor_4);
+
     pca9685_set_pwm(0, e->motor_1);
     pca9685_set_pwm(1, e->motor_2);
     pca9685_set_pwm(2, e->motor_3);

@@ -10,7 +10,7 @@
 #include "control.h"
 #include "mpu6050.h"
 #include "pca9685.h"
-#include "telemetry.h"
+#include "comms.h"
 
 
 /* STRUCTURES */
