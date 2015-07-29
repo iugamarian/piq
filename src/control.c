@@ -34,6 +34,7 @@ struct esc *esc_setup(void)
     /* setup pca9685 */
     pca9685_setup(e->frequency);
     sleep(1);
+    esc_set_throttles(e);
 
     return e;
 }

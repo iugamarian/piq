@@ -148,6 +148,10 @@ void *comms_loop(void *arg)
             log_info("reset pca9685");
             pca9685_reset();
 
+        } else if (strcmp(buf, "c") == 0) {
+            log_info("calibrate esc");
+            esc_calibrate(p->motors);
+
         } else if (strcmp(buf, "q") == 0) {
             p->imu->state = 0;
             log_info("quit telemetry loop!");
