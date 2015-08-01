@@ -15,21 +15,16 @@ struct esc *esc_setup(void)
     duty_min = (0.001 / (1.0 / (float) e->frequency));
     duty_max = (0.002 / (1.0 / (float) e->frequency));
 
-    /* calculate PCA9685 motor bounds - out of 4095 */
+    /* calculate PCA9685 motor bounds - out of 4095 (12bit range) */
     e->min = (int) 4096.0 * duty_min;
     e->max = (int) 4096.0 * duty_max;
-
-    log_info("frequency: %d", e->frequency);
-    log_info("duty min: %f", duty_min);
-    log_info("duty max: %f", duty_max);
-    log_info("min: %d", e->min);
-    log_info("max: %d", e->max);
+    e->range = e->max - e->min;
 
     /* set motor defaults */
-    e->motor_1 = 0;
-    e->motor_2 = 0;
-    e->motor_3 = 0;
-    e->motor_4 = 0;
+    e->motor_1 = 0.0f;
+    e->motor_2 = 0.0f;
+    e->motor_3 = 0.0f;
+    e->motor_4 = 0.0f;
 
     /* setup pca9685 */
     pca9685_setup(e->frequency);
@@ -42,7 +37,14 @@ struct esc *esc_setup(void)
 void esc_destroy(void *target)
 {
     struct esc *e;
+
     e = target;
+    /* set throttle to 0% */
+    pca9685_set_pwm(0, e->min);
+    pca9685_set_pwm(1, e->min);
+    pca9685_set_pwm(2, e->min);
+    pca9685_set_pwm(3, e->min);
+
     free(e);
 }
 
@@ -66,15 +68,15 @@ void esc_set_throttles(struct esc *e)
         e->motor_4 = e->motor_4 - pitchpid;
     */
 
-    log_info("throttle_1: %d%", e->motor_1);
-    log_info("throttle_2: %d%", e->motor_2);
-    log_info("throttle_3: %d%", e->motor_3);
-    log_info("throttle_4: %d%", e->motor_4);
+    log_info("throttle_1: %d%", e->motor_1 * 100);
+    log_info("throttle_2: %d%", e->motor_2 * 100);
+    log_info("throttle_3: %d%", e->motor_3 * 100);
+    log_info("throttle_4: %d%", e->motor_4 * 100);
 
-    pca9685_set_pwm(0, e->max * ((float) (e->motor_1 / 100.0f)));
-    pca9685_set_pwm(1, e->max * ((float) (e->motor_2 / 100.0f)));
-    pca9685_set_pwm(2, e->max * ((float) (e->motor_3 / 100.0f)));
-    pca9685_set_pwm(3, e->max * ((float) (e->motor_4 / 100.0f)));
+    pca9685_set_pwm(0, e->min + (e->range * e->motor_1));
+    pca9685_set_pwm(1, e->min + (e->range * e->motor_2));
+    pca9685_set_pwm(2, e->min + (e->range * e->motor_3));
+    pca9685_set_pwm(3, e->min + (e->range * e->motor_4));
 }
 
 

@@ -13,7 +13,6 @@ struct mpu6050_data *mpu6050_setup(void)
     data = malloc(sizeof(struct mpu6050_data));
     data->gyro = malloc(sizeof(struct gyroscope));
     data->accel = malloc(sizeof(struct accelerometer));
-    data->state = 1;
 
     /* set intial values */
     data->gyro->offset_x = 0;

@@ -178,8 +178,6 @@ struct accelerometer
 
 struct mpu6050_data
 {
-    int state;
-
     struct gyroscope *gyro;
     struct accelerometer *accel;
 

@@ -13,9 +13,14 @@
 #include "comms.h"
 
 
+#define PIQ_STOP 0
+#define PIQ_RUN 1
+
+
 /* STRUCTURES */
 struct piq
 {
+    int state;
     struct mpu6050_data *imu;
     struct esc *motors;
 };

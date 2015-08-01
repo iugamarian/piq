@@ -6,7 +6,7 @@ void *mpu6050_loop(void *arg)
     struct piq *p;
 
     p = arg;
-    while (p->imu->state) {
+    while (p->state == PIQ_RUN) {
         mpu6050_data(p->imu);
     }
 

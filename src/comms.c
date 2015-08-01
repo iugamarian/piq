@@ -102,7 +102,7 @@ void *comms_loop(void *arg)
     silent_check(client != NULL);
     log_info("connected to %s!", ip);
 
-    while (p->imu->state) {
+    while (p->state == PIQ_RUN) {
         /* setup */
         memset(buf, '\0', 100);
         sprintf(
@@ -130,18 +130,18 @@ void *comms_loop(void *arg)
 
         } else if (strcmp(buf, "w") == 0) {
             log_info("throttle up");
-            p->motors->motor_1 += 1;
-            p->motors->motor_2 += 1;
-            p->motors->motor_3 += 1;
-            p->motors->motor_4 += 1;
+            p->motors->motor_1 += 0.01;
+            p->motors->motor_2 += 0.01;
+            p->motors->motor_3 += 0.01;
+            p->motors->motor_4 += 0.01;
             esc_set_throttles(p->motors);
 
         } else if (strcmp(buf, "s") == 0) {
             log_info("throttle down");
-            p->motors->motor_1 -= 1;
-            p->motors->motor_2 -= 1;
-            p->motors->motor_3 -= 1;
-            p->motors->motor_4 -= 1;
+            p->motors->motor_1 -= 0.01;
+            p->motors->motor_2 -= 0.01;
+            p->motors->motor_3 -= 0.01;
+            p->motors->motor_4 -= 0.01;
             esc_set_throttles(p->motors);
 
         } else if (strcmp(buf, "r") == 0) {
@@ -153,8 +153,8 @@ void *comms_loop(void *arg)
             esc_calibrate(p->motors);
 
         } else if (strcmp(buf, "q") == 0) {
-            p->imu->state = 0;
-            log_info("quit telemetry loop!");
+            p->state = PIQ_STOP;
+            log_info("halt!");
             break;
 
         }
@@ -166,7 +166,7 @@ void *comms_loop(void *arg)
     *retval = 0;
     return retval;
 error:
-    p->imu->state = 0;
+    p->state = 0;
     retval = malloc(sizeof(int));
     *retval = -1;
     return retval;

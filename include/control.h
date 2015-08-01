@@ -15,11 +15,12 @@ struct esc
     int frequency;
     int min;
     int max;
+    int range;
 
-    int8_t motor_1;
-    int8_t motor_2;
-    int8_t motor_3;
-    int8_t motor_4;
+    float motor_1;
+    float motor_2;
+    float motor_3;
+    float motor_4;
 };
 
 struct pid
