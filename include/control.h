@@ -16,10 +16,10 @@ struct esc
     int min;
     int max;
 
-    int16_t motor_1;
-    int16_t motor_2;
-    int16_t motor_3;
-    int16_t motor_4;
+    int8_t motor_1;
+    int8_t motor_2;
+    int8_t motor_3;
+    int8_t motor_4;
 };
 
 struct pid

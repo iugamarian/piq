@@ -130,18 +130,18 @@ void *comms_loop(void *arg)
 
         } else if (strcmp(buf, "w") == 0) {
             log_info("throttle up");
-            p->motors->motor_1 += 100;
-            p->motors->motor_2 += 100;
-            p->motors->motor_3 += 100;
-            p->motors->motor_4 += 100;
+            p->motors->motor_1 += 1;
+            p->motors->motor_2 += 1;
+            p->motors->motor_3 += 1;
+            p->motors->motor_4 += 1;
             esc_set_throttles(p->motors);
 
         } else if (strcmp(buf, "s") == 0) {
             log_info("throttle down");
-            p->motors->motor_1 -= 100;
-            p->motors->motor_2 -= 100;
-            p->motors->motor_3 -= 100;
-            p->motors->motor_4 -= 100;
+            p->motors->motor_1 -= 1;
+            p->motors->motor_2 -= 1;
+            p->motors->motor_3 -= 1;
+            p->motors->motor_4 -= 1;
             esc_set_throttles(p->motors);
 
         } else if (strcmp(buf, "r") == 0) {

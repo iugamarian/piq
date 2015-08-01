@@ -26,10 +26,10 @@ struct esc *esc_setup(void)
     log_info("max: %d", e->max);
 
     /* set motor defaults */
-    e->motor_1 = e->min + 100;
-    e->motor_2 = e->min + 100;
-    e->motor_3 = e->min + 100;
-    e->motor_4 = e->min + 100;
+    e->motor_1 = 0;
+    e->motor_2 = 0;
+    e->motor_3 = 0;
+    e->motor_4 = 0;
 
     /* setup pca9685 */
     pca9685_setup(e->frequency);
@@ -66,15 +66,15 @@ void esc_set_throttles(struct esc *e)
         e->motor_4 = e->motor_4 - pitchpid;
     */
 
-    log_info("throttle_1: %d", e->motor_1);
-    log_info("throttle_2: %d", e->motor_2);
-    log_info("throttle_3: %d", e->motor_3);
-    log_info("throttle_4: %d", e->motor_4);
+    log_info("throttle_1: %d%", e->motor_1);
+    log_info("throttle_2: %d%", e->motor_2);
+    log_info("throttle_3: %d%", e->motor_3);
+    log_info("throttle_4: %d%", e->motor_4);
 
-    pca9685_set_pwm(0, e->motor_1);
-    pca9685_set_pwm(1, e->motor_2);
-    pca9685_set_pwm(2, e->motor_3);
-    pca9685_set_pwm(3, e->motor_4);
+    pca9685_set_pwm(0, e->max * ((float) (e->motor_1 / 100.0f)));
+    pca9685_set_pwm(1, e->max * ((float) (e->motor_2 / 100.0f)));
+    pca9685_set_pwm(2, e->max * ((float) (e->motor_3 / 100.0f)));
+    pca9685_set_pwm(3, e->max * ((float) (e->motor_4 / 100.0f)));
 }
 
 
