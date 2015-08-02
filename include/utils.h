@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <unistd.h>
 #include <termios.h>
@@ -63,5 +64,6 @@ void terminal_restore(struct terminal_settings *ts);
 int terminal_kbhit(struct terminal_settings *ts);
 int getch(void);
 int getche(void);
+int fltcmp(const void *v1, const void *v2);
 
 #endif

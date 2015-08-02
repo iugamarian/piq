@@ -5,9 +5,11 @@ default: rmdirs all done
 
 all: mkdirs
 	@make -s -C src
+	@make -s -C tests
 
 debug: mkdirs
 	make -C src
+	@make -C tests
 
 mkdirs: rmdirs
 	@mkdir bin

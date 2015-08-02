@@ -37,3 +37,8 @@ MAKE_OBJ = \
 MAKE_STATIC_LIB = \
 	@echo "AR [$@]"; \
 	$(AR) $(ARFLAGS) $(LIB_DIR)/$@.a $(wildcard $(OBJ_DIR)/*.o);
+
+MAKE_TEST = \
+	echo "TEST [$@]"; \
+	$(CC) $(CFLAGS) -c $@.c -o $(OBJ_DIR)/$@.o; \
+	$(CC) $(OBJ_DIR)/$@.o -o $(BIN_DIR)/$@ $(LIBS);

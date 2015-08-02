@@ -9,6 +9,8 @@ struct esc *esc_setup(void)
 
     /* setup */
     e = malloc(sizeof(struct esc));
+    e->pitch_pid = pid_setup(0.0f, 0.0f, 0.0f, 0.0f);
+    e->roll_pid = pid_setup(0.0f, 0.0f, 0.0f, 0.0f);
 
     /* calculate min / max duty cycle */
     e->frequency = 400;
@@ -39,11 +41,16 @@ void esc_destroy(void *target)
     struct esc *e;
 
     e = target;
+
     /* set throttle to 0% */
     pca9685_set_pwm(0, e->min);
     pca9685_set_pwm(1, e->min);
     pca9685_set_pwm(2, e->min);
     pca9685_set_pwm(3, e->min);
+
+    /* free pids */
+    pid_destroy(e->pitch_pid);
+    pid_destroy(e->roll_pid);
 
     free(e);
 }
@@ -61,17 +68,10 @@ void esc_calibrate(struct esc *e)
 
 void esc_set_throttles(struct esc *e)
 {
-    /*
-        e->motor_1 = e->motor_1 + rollpid;
-        e->motor_2 = e->motor_2 + pitchpid;
-        e->motor_3 = e->motor_3 - rollpid;
-        e->motor_4 = e->motor_4 - pitchpid;
-    */
-
-    log_info("throttle_1: %f", e->motor_1);
-    log_info("throttle_2: %f", e->motor_2);
-    log_info("throttle_3: %f", e->motor_3);
-    log_info("throttle_4: %f", e->motor_4);
+    e->motor_1 = e->motor_1 + e->roll_pid->output;
+    e->motor_2 = e->motor_2 + e->pitch_pid->output;
+    e->motor_3 = e->motor_3 - e->roll_pid->output;
+    e->motor_4 = e->motor_4 - e->pitch_pid->output;
 
     pca9685_set_pwm(0, e->min + (e->range * e->motor_1));
     pca9685_set_pwm(1, e->min + (e->range * e->motor_2));

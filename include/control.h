@@ -10,19 +10,6 @@
 
 
 /* STRUCTURES */
-struct esc
-{
-    int frequency;
-    int min;
-    int max;
-    int range;
-
-    float motor_1;
-    float motor_2;
-    float motor_3;
-    float motor_4;
-};
-
 struct pid
 {
     float setpoint;
@@ -39,14 +26,30 @@ struct pid
     clock_t last_updated;
 };
 
+struct esc
+{
+    int frequency;
+    int min;
+    int max;
+    int range;
+
+    float motor_1;
+    float motor_2;
+    float motor_3;
+    float motor_4;
+
+    struct pid *pitch_pid;
+    struct pid *roll_pid;
+};
+
 
 /* FUNCTIONS */
+struct pid *pid_setup(float setpoint, float k_p, float k_i, float k_d);
+void pid_destroy(void *target);
+float pid_calculate(struct pid *p, float actual);
 struct esc *esc_setup(void);
 void esc_destroy(void *target);
 void esc_calibrate(struct esc *e);
 void esc_set_throttles(struct esc *e);
-struct pid *pid_setup(float setpoint, float k_p, float k_i, float k_d);
-void pid_destroy(void *target);
-float pid_calculate(struct pid *p, float actual);
 
 #endif

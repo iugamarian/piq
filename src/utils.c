@@ -91,3 +91,29 @@ int getche(void)
 
     return ch;
 }
+
+int fltcmp(const void *v1, const void *v2)
+{
+    /* null-check */
+    if (v1 == NULL || v2 == NULL) {
+        if (v1 == NULL) {
+            return -1;
+        } else if (v1 == NULL) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /* compare floats */
+    if (fabs(*(float *) v1 - *(float *) v2) <= 0.00001) {
+        return 0;
+    } else if (*(float *) v1 > *(float *) v2) {
+        return 1;
+    } else if (*(float *) v1 < *(float *) v2) {
+        return -1;
+    } else {
+        printf("Error! Undefined runtime behaviour!\n");
+        return -1;
+    }
+}
