@@ -68,10 +68,10 @@ void esc_set_throttles(struct esc *e)
         e->motor_4 = e->motor_4 - pitchpid;
     */
 
-    log_info("throttle_1: %d%", e->motor_1 * 100);
-    log_info("throttle_2: %d%", e->motor_2 * 100);
-    log_info("throttle_3: %d%", e->motor_3 * 100);
-    log_info("throttle_4: %d%", e->motor_4 * 100);
+    log_info("throttle_1: %f", e->motor_1);
+    log_info("throttle_2: %f", e->motor_2);
+    log_info("throttle_3: %f", e->motor_3);
+    log_info("throttle_4: %f", e->motor_4);
 
     pca9685_set_pwm(0, e->min + (e->range * e->motor_1));
     pca9685_set_pwm(1, e->min + (e->range * e->motor_2));

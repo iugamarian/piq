@@ -18,6 +18,7 @@ struct piq *piq_setup(void)
     struct piq *p;
 
     p = malloc(sizeof(struct piq));
+    p->state = PIQ_RUN;
     p->imu = mpu6050_setup();
     p->motors = esc_setup();
 

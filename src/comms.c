@@ -107,7 +107,7 @@ void *comms_loop(void *arg)
         memset(buf, '\0', 100);
         sprintf(
             buf,
-            "%f %f %d %d %d %d",
+            "%f %f %f %f %f %f",
             p->imu->pitch,
             p->imu->roll,
             p->motors->motor_1,
