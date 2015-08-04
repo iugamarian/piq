@@ -68,10 +68,10 @@ void esc_calibrate(struct esc *e)
 
 void esc_set_throttles(struct esc *e)
 {
-    e->motor_1 = e->motor_1 + e->roll_pid->output;
-    e->motor_2 = e->motor_2 + e->pitch_pid->output;
-    e->motor_3 = e->motor_3 - e->roll_pid->output;
-    e->motor_4 = e->motor_4 - e->pitch_pid->output;
+    e->motor_1 = e->throttle + e->roll_pid->output;
+    e->motor_2 = e->throttle + e->pitch_pid->output;
+    e->motor_3 = e->throttle - e->roll_pid->output;
+    e->motor_4 = e->throttle - e->pitch_pid->output;
 
     pca9685_set_pwm(0, e->min + (e->range * e->motor_1));
     pca9685_set_pwm(1, e->min + (e->range * e->motor_2));
@@ -94,9 +94,13 @@ struct pid *pid_setup(float setpoint, float k_p, float k_i, float k_d)
     p->k_i = k_i;
     p->k_d = k_d;
 
+    p->integral_error = 0.0f;
+    p->derivative_error = 0.0f;
+
     p->dead_zone = 0.0f;
     p->bound_min = 0.0f;
     p->bound_max = 0.0f;
+    p->last_updated = clock();
 
     return p;
 }
@@ -110,43 +114,58 @@ void pid_destroy(void *target)
     p = NULL;
 }
 
-float pid_calculate(struct pid *p, float actual)
+int pid_precheck(struct pid *p)
+{
+    int k_p_zero;
+    int k_i_zero;
+    int k_d_zero;
+
+    /* check if k_p, k_i or k_d is 0 */
+    k_p_zero = (fltcmp(p->k_p, 0.0f) == 0) ? 1 : 0;
+    k_i_zero = (fltcmp(p->k_i, 0.0f) == 0) ? 1 : 0;
+    k_d_zero = (fltcmp(p->k_d, 0.0f) == 0) ? 1 : 0;
+
+    if (k_p_zero && k_i_zero && k_d_zero) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int pid_calculate(struct pid *p, float actual)
 {
     float dt;
     float error;
-    float output;
-    float integral;
-    float derivative;
-    clock_t time_now;
 
-    /* setup */
-    dt = 0.0;
-    output = 0.0;
-    integral = 0.0f;
-    derivative = 0.0f;
+    /* pre-check */
+    if (pid_precheck(p) == -1){
+        log_err("pid constant values are zero!");
+        return -1;
+    }
 
     /* calculate dt */
-    time_now = clock();
-    dt = ((double) time_now - p->last_updated) / CLOCKS_PER_SEC;
+    dt = ((double) clock() - p->last_updated) / CLOCKS_PER_SEC;
 
     /* calculate error */
     error = p->setpoint - actual;
 
-    /* calculate integral */
-    if (abs(error) > p->dead_zone) {
-        integral = integral * error * dt;
+    /* calculate derivative and integral errors */
+    if (fabs(error) > p->dead_zone) {
+        p->integral_error += error * dt;
+    }
+    if (dt) {
+        p->derivative_error = (error - p->prev_error) / dt;
     }
 
-    /* calculate derivative */
-    derivative = (error - p->prev_error) / dt;
-
     /* calculate output */
-    p->output = (p->k_p * error) + (p->k_i * integral) + (p->k_d * derivative);
+    p->output = (p->k_p * error);
+    p->output += (p->k_i * p->integral_error);
+    p->output += (p->k_d * p->derivative_error);
 
     /* saturation filter */
     if (p->output > p->bound_max) {
         p->output = p->bound_max;
-    } else if (output < p->bound_min) {
+    } else if (p->output < p->bound_min) {
         p->output = p->bound_min;
     }
 
@@ -154,5 +173,5 @@ float pid_calculate(struct pid *p, float actual)
     p->prev_error = error;
     p->last_updated = clock();
 
-    return output;
+    return 0;
 }

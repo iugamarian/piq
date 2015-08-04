@@ -64,6 +64,6 @@ void terminal_restore(struct terminal_settings *ts);
 int terminal_kbhit(struct terminal_settings *ts);
 int getch(void);
 int getche(void);
-int fltcmp(const void *v1, const void *v2);
+int fltcmp(float v1, float v2);
 
 #endif

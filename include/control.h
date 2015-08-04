@@ -20,6 +20,9 @@ struct pid
     float k_i;
     float k_d;
 
+    float integral_error;
+    float derivative_error;
+
     float dead_zone;
     float bound_min;
     float bound_max;
@@ -33,6 +36,7 @@ struct esc
     int max;
     int range;
 
+    float throttle;
     float motor_1;
     float motor_2;
     float motor_3;
@@ -46,7 +50,8 @@ struct esc
 /* FUNCTIONS */
 struct pid *pid_setup(float setpoint, float k_p, float k_i, float k_d);
 void pid_destroy(void *target);
-float pid_calculate(struct pid *p, float actual);
+int pid_calculate(struct pid *p, float actual);
+int pid_precheck(struct pid *p);
 struct esc *esc_setup(void);
 void esc_destroy(void *target);
 void esc_calibrate(struct esc *e);
