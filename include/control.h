@@ -7,6 +7,7 @@
 
 #include "piq.h"
 #include "pca9685.h"
+#include "mpu6050.h"
 
 
 /* STRUCTURES */
@@ -48,13 +49,22 @@ struct esc
 
 
 /* FUNCTIONS */
-struct pid *pid_setup(float setpoint, float k_p, float k_i, float k_d);
+/* PID FUNCTIONS */
+struct pid *pid_setup(
+    float setpoint,
+    float k_p,
+    float k_i,
+    float k_d,
+    float bound_min,
+    float bound_max
+);
 void pid_destroy(void *target);
-int pid_calculate(struct pid *p, float actual);
 int pid_precheck(struct pid *p);
+int pid_calculate(struct pid *p, float actual);
+/* ESC FUNCTIONS */
 struct esc *esc_setup(void);
 void esc_destroy(void *target);
 void esc_calibrate(struct esc *e);
-void esc_set_throttles(struct esc *e);
+void esc_set_throttles(struct esc *e, struct mpu6050_data *imu);
 
 #endif
