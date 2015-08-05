@@ -39,7 +39,7 @@ struct mpu6050_data *mpu6050_setup(void)
     i2c_write_byte(MPU6050_RA_PWR_MGMT_1, 0x00);
 
     /* set dplf */
-    mpu6050_set_dplf_config(3);
+    mpu6050_set_dplf_config(6);
     retval = mpu6050_get_dplf_config();
     if (retval > 7 || retval < 0) {
         return NULL;
