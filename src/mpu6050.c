@@ -38,6 +38,15 @@ struct mpu6050_data *mpu6050_setup(void)
     /* set power management register */
     i2c_write_byte(MPU6050_RA_PWR_MGMT_1, 0x00);
 
+    /* set dplf */
+    mpu6050_set_dplf_config(3);
+    retval = mpu6050_get_dplf_config();
+    if (retval > 7 || retval < 0) {
+        return NULL;
+    } else{
+        data->dplf_config = retval;
+    }
+
     /* get gyro range */
     mpu6050_set_gyro_range(0);
     retval = mpu6050_get_gyro_range();
@@ -49,6 +58,8 @@ struct mpu6050_data *mpu6050_setup(void)
         data->gyro->sensitivity = 32.8;
     } else if (retval == 3) {
         data->gyro->sensitivity = 16.4;
+    } else {
+        return NULL;
     }
 
     /* get accel range */
@@ -62,6 +73,8 @@ struct mpu6050_data *mpu6050_setup(void)
         data->accel->sensitivity = 4096.0;
     } else if (retval == 3) {
         data->accel->sensitivity = 2048.0;
+    } else {
+        return NULL;
     }
 
     /* get sample rate */
@@ -237,6 +250,69 @@ void mpu6050_data_print(struct mpu6050_data *data)
     printf("\n");
 }
 
+int8_t mpu6050_get_dplf_config(void)
+{
+    char data[1];
+    int retval;
+
+    /* get dplf config */
+    data[0] = 0x00;
+    i2c_set_slave(MPU6050_ADDRESS);
+    retval = i2c_read_bytes(MPU6050_RA_CONFIG, data, 1);
+    if (retval != 0) {
+        return -1;
+    }
+
+    return (data[0] & 0b00000111);
+}
+
+int8_t mpu6050_set_dplf_config(int8_t setting)
+{
+    char data[1];
+    int retval;
+
+    /*
+        DPLF_CFG    Accelerometer
+        ----------------------------------------
+                    Bandwidth(Hz) | Delay(ms)
+        0           260             0
+        1           184             2.0
+        2           94              3.0
+        3           44              4.9
+        4           21              8.5
+        5           10              13.8
+        6           5               19.0
+        7           RESERVED        RESERVED
+
+
+        DPLF_CFG    Gyroscope
+        ----------------------------------------------
+                    Bandwidth(Hz) | Delay(ms) | Fs(kHz)
+        0           256             0.98        8
+        1           188             1.9         1
+        2           98              2.8         1
+        3           42              4.8         1
+        4           20              8.3         1
+        5           10              13.4        1
+        6           5               18.5        1
+        7           RESERVED        RESERVED    8
+    */
+
+    /* check setting range */
+    if (setting > 7 || setting < 0) {
+        return -2;
+    }
+
+    /* set DPLF */
+    data[0] = setting;
+    i2c_set_slave(MPU6050_ADDRESS);
+    retval = i2c_write_bytes(MPU6050_RA_CONFIG, data, 1);
+    if (retval != 0) {
+        return -1;
+    }
+
+    return 0;
+}
 
 int16_t mpu6050_get_sample_rate(void)
 {
