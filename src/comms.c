@@ -131,12 +131,10 @@ void *comms_loop(void *arg)
         } else if (strcmp(buf, "w") == 0) {
             log_info("throttle up");
             p->motors->throttle += 0.01;
-            esc_set_throttles(p->motors, p->imu);
 
         } else if (strcmp(buf, "s") == 0) {
             log_info("throttle down");
             p->motors->throttle -= 0.01;
-            esc_set_throttles(p->motors, p->imu);
 
         } else if (strcmp(buf, "r") == 0) {
             log_info("reset pca9685");
@@ -152,6 +150,8 @@ void *comms_loop(void *arg)
             break;
 
         }
+        esc_set_throttles(p->motors, p->imu);
+
     }
     log_info("disconnected from %s!", ip);
     close(client->socket);
