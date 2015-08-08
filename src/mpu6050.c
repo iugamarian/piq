@@ -211,18 +211,18 @@ int8_t mpu6050_calibrate(struct mpu6050_data *data)
         data->accel->offset_y += data->accel->raw_y;
         data->accel->offset_z += data->accel->raw_z;
 
+        data->accel->offset_x = data->accel->offset_x / 2.0;
+        data->accel->offset_y = data->accel->offset_y / 2.0;
+        data->accel->offset_z = data->accel->offset_z / 2.0;
+
         data->gyro->offset_x += data->gyro->raw_x;
         data->gyro->offset_y += data->gyro->raw_y;
         data->gyro->offset_z += data->gyro->raw_z;
+
+        data->gyro->offset_x = data->gyro->offset_x / 2.0;
+        data->gyro->offset_y = data->gyro->offset_y / 2.0;
+        data->gyro->offset_z = data->gyro->offset_z / 2.0;
     }
-
-    data->accel->offset_x = data->accel->offset_x / 5000.0;
-    data->accel->offset_y = data->accel->offset_y / 5000.0;
-    data->accel->offset_z = data->accel->offset_z / 5000.0;
-
-    data->gyro->offset_x = data->gyro->offset_x / 5000.0;
-    data->gyro->offset_y = data->gyro->offset_y / 5000.0;
-    data->gyro->offset_z = data->gyro->offset_z / 5000.0;
 
     return 0;
 }
