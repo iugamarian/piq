@@ -38,14 +38,14 @@ struct mpu6050_data *mpu6050_setup(void)
     /* set power management register */
     i2c_write_byte(MPU6050_RA_PWR_MGMT_1, 0x00);
 
-    /* set dplf */
-    mpu6050_set_dplf_config(6);
-    retval = mpu6050_get_dplf_config();
-    if (retval > 7 || retval < 0) {
-        return NULL;
-    } else{
-        data->dplf_config = retval;
-    }
+    /* #<{(| set dplf |)}># */
+    /* mpu6050_set_dplf_config(0); */
+    /* retval = mpu6050_get_dplf_config(); */
+    /* if (retval > 7 || retval < 0) { */
+    /*     return NULL; */
+    /* } else{ */
+    /*     data->dplf_config = retval; */
+    /* } */
 
     /* get gyro range */
     mpu6050_set_gyro_range(0);
@@ -81,7 +81,7 @@ struct mpu6050_data *mpu6050_setup(void)
     data->sample_rate = mpu6050_get_sample_rate();
 
     /* calibrate mpu6050 */
-    /* mpu6050_calibrate(data); */
+    mpu6050_calibrate(data);
 
     return data;
 }

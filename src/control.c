@@ -172,26 +172,27 @@ void esc_calibrate(struct esc *e)
 
 void esc_set_throttles(struct esc *e, struct mpu6050_data *imu)
 {
+    pid_calculate(e->pitch_pid, imu->pitch);
+    pid_calculate(e->roll_pid, imu->roll);
+
+    log_info("roll: %f", imu->roll);
+    log_info("pitch: %f", imu->pitch);
+    log_info("roll_pid->output: %f", e->roll_pid->output);
+    log_info("pitch_pid->output: %f", e->pitch_pid->output);
+
+    e->motor_1 = e->throttle + e->roll_pid->output + e->pitch_pid->output;
+    e->motor_2 = e->throttle - e->roll_pid->output + e->pitch_pid->output;
+    e->motor_3 = e->throttle + e->roll_pid->output - e->pitch_pid->output;
+    e->motor_4 = e->throttle - e->roll_pid->output - e->pitch_pid->output;
+
     log_info("throttle: %f", e->throttle);
-    if (e->throttle > 0) {
-        pid_calculate(e->pitch_pid, imu->pitch);
-        pid_calculate(e->roll_pid, imu->roll);
+    log_info("e->motor_1: %f", e->motor_1);
+    log_info("e->motor_2: %f", e->motor_2);
+    log_info("e->motor_3: %f", e->motor_3);
+    log_info("e->motor_4: %f\n", e->motor_4);
 
-        log_info("roll_pid->output: %f", e->roll_pid->output);
-        log_info("pitch_pid->output: %f", e->pitch_pid->output);
-        log_info("e->motor_1: %f", e->motor_1);
-        log_info("e->motor_2: %f", e->motor_2);
-        log_info("e->motor_3: %f", e->motor_3);
-        log_info("e->motor_4: %f\n", e->motor_4);
-
-        e->motor_1 = e->throttle + e->roll_pid->output + e->pitch_pid->output;
-        e->motor_2 = e->throttle - e->roll_pid->output + e->pitch_pid->output;
-        e->motor_3 = e->throttle + e->roll_pid->output - e->pitch_pid->output;
-        e->motor_4 = e->throttle - e->roll_pid->output - e->pitch_pid->output;
-
-        pca9685_set_pwm(0, e->min + (e->range * e->motor_1));
-        pca9685_set_pwm(1, e->min + (e->range * e->motor_2));
-        pca9685_set_pwm(2, e->min + (e->range * e->motor_3));
-        pca9685_set_pwm(3, e->min + (e->range * e->motor_4));
-    }
+    /* pca9685_set_pwm(0, e->min + (e->range * e->motor_1)); */
+    /* pca9685_set_pwm(1, e->min + (e->range * e->motor_2)); */
+    /* pca9685_set_pwm(2, e->min + (e->range * e->motor_3)); */
+    /* pca9685_set_pwm(3, e->min + (e->range * e->motor_4)); */
 }
