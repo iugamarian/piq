@@ -29,6 +29,8 @@ static int tcp_client_setup(struct tcp_client *c)
         sizeof(sock_ipv4)
     );
     check(retval == 0, "failed to connect to %s", c->ip);
+    retval = fcntl(c->socket, F_SETFL, O_NONBLOCK);
+    check(retval != -1, "failed to set socket as non-blocking!");
 
     return 0;
 
@@ -92,6 +94,8 @@ void *comms_loop(void *arg)
     char buf[100];
     struct tcp_client *client;
     struct piq *p;
+    struct timeval tv;
+    fd_set readfds;
 
     /* setup */
     ip = "10.0.0.13";
@@ -102,14 +106,22 @@ void *comms_loop(void *arg)
     silent_check(client != NULL);
     log_info("connected to %s!", ip);
 
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+
+    /* events loop */
     while (p->state == PIQ_RUN) {
+        FD_ZERO(&readfds);
+        FD_SET(client->socket, &readfds);
+        select(client->socket + 1, &readfds, NULL, NULL, &tv);
+
         mpu6050_data(p->imu);
 
         /* setup */
         memset(buf, '\0', 100);
         sprintf(
             buf,
-            "%f %f %f %f %f %f",
+            "%f %f %f %f %f %f\n",
             p->imu->pitch,
             p->imu->roll,
             p->motors->motor_1,
@@ -125,13 +137,13 @@ void *comms_loop(void *arg)
 
         /* receive */
         memset(buf, '\0', 100);
-        read_size = read(client->socket, buf, 100);
-        check(read_size > 0, "failed to read from server!");
-        if (strcmp(buf, ".") == 0) {
-            // do nothing
+        if (FD_ISSET(client->socket, &readfds)) {
+            read_size = read(client->socket, buf, 100);
+            check(read_size > 0, "failed to read from server!");
+        }
 
         /* THROTTLE */
-        } else if (strcmp(buf, "]") == 0) {
+        if (strcmp(buf, "]") == 0) {
             log_info("throttle up");
             p->motors->throttle += 0.01;
 
