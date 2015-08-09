@@ -180,10 +180,10 @@ void esc_set_throttles(struct esc *e, struct mpu6050_data *imu)
     log_info("roll_pid->output: %f", e->roll_pid->output);
     log_info("pitch_pid->output: %f", e->pitch_pid->output);
 
-    e->motor_1 = e->throttle - e->roll_pid->output - e->pitch_pid->output;
-    e->motor_2 = e->throttle + e->roll_pid->output - e->pitch_pid->output;
-    e->motor_3 = e->throttle - e->roll_pid->output + e->pitch_pid->output;
-    e->motor_4 = e->throttle + e->roll_pid->output + e->pitch_pid->output;
+    e->motor_1 = e->throttle - e->roll_pid->output + e->pitch_pid->output;
+    e->motor_2 = e->throttle + e->roll_pid->output + e->pitch_pid->output;
+    e->motor_3 = e->throttle - e->roll_pid->output - e->pitch_pid->output;
+    e->motor_4 = e->throttle + e->roll_pid->output - e->pitch_pid->output;
 
     log_info("throttle: %f", e->throttle);
     log_info("e->motor_1: %f", e->motor_1);

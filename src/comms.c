@@ -130,14 +130,74 @@ void *comms_loop(void *arg)
         if (strcmp(buf, ".") == 0) {
             // do nothing
 
-        } else if (strcmp(buf, "w") == 0) {
+        /* THROTTLE */
+        } else if (strcmp(buf, "]") == 0) {
             log_info("throttle up");
             p->motors->throttle += 0.01;
 
-        } else if (strcmp(buf, "s") == 0) {
+        } else if (strcmp(buf, "[") == 0) {
             log_info("throttle down");
             p->motors->throttle -= 0.01;
 
+        /* PID PITCH AND ROLL SET POINT */
+        } else if (strcmp(buf, "w") == 0) {
+            p->motors->pitch_pid->setpoint += 1.0;
+            log_info(
+                "increase pitch offset to %f",
+                p->motors->pitch_pid->setpoint
+            );
+
+        } else if (strcmp(buf, "s") == 0) {
+            p->motors->pitch_pid->setpoint -= 1.0;
+            log_info(
+                "decrease pitch offset to %f",
+                p->motors->pitch_pid->setpoint
+            );
+
+        } else if (strcmp(buf, "a") == 0) {
+            p->motors->roll_pid->setpoint -= 1.0;
+            log_info(
+                "decrease roll offset to %f",
+                p->motors->roll_pid->setpoint
+            );
+
+        } else if (strcmp(buf, "d") == 0) {
+            p->motors->roll_pid->setpoint += 1.0;
+            log_info(
+                "increase roll offset to %f",
+                p->motors->roll_pid->setpoint
+            );
+
+        /* IMU PITCH AND ROLL OFFSET */
+        } else if (strcmp(buf, "W") == 0) {
+            p->imu->pitch_offset += 1.0;
+            log_info(
+                "increase imu pitch offset to %f",
+                p->imu->pitch_offset
+            );
+
+        } else if (strcmp(buf, "S") == 0) {
+            p->imu->pitch_offset -= 1.0;
+            log_info(
+                "increase imu pitch offset to %f",
+                p->imu->pitch_offset
+            );
+
+        } else if (strcmp(buf, "A") == 0) {
+            p->imu->roll_offset -= 1.0;
+            log_info(
+                "increase imu roll offset to %f",
+                p->imu->roll_offset
+            );
+
+        } else if (strcmp(buf, "D") == 0) {
+            p->imu->roll_offset += 1.0;
+            log_info(
+                "increase imu roll offset to %f",
+                p->imu->roll_offset
+            );
+
+        /* MISC */
         } else if (strcmp(buf, "r") == 0) {
             log_info("reset pca9685");
             pca9685_reset();

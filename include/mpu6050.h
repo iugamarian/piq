@@ -188,6 +188,9 @@ struct mpu6050_data
     float pitch;
     float roll;
 
+    float pitch_offset;
+    float roll_offset;
+
     clock_t last_updated;
 };
 

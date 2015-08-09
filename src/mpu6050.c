@@ -15,22 +15,25 @@ struct mpu6050_data *mpu6050_setup(void)
     data->accel = malloc(sizeof(struct accelerometer));
 
     /* set intial values */
-    data->gyro->offset_x = 0;
-    data->gyro->offset_y = 0;
-    data->gyro->offset_z = 0;
-    data->gyro->pitch = 0;
-    data->gyro->roll = 0;
+    data->gyro->offset_x = 0.0f;
+    data->gyro->offset_y = 0.0f;
+    data->gyro->offset_z = 0.0f;
+    data->gyro->pitch = 0.0f;
+    data->gyro->roll = 0.0f;
 
-    data->accel->offset_x = 0;
-    data->accel->offset_y = 0;
-    data->accel->offset_z = 0;
-    data->accel->pitch = 0;
-    data->accel->roll = 0;
+    data->accel->offset_x = 0.0f;
+    data->accel->offset_y = 0.0f;
+    data->accel->offset_z = 0.0f;
+    data->accel->pitch = 0.0f;
+    data->accel->roll = 0.0f;
 
-    data->pitch = 0;
-    data->roll = 0;
+    data->pitch = 0.0f;
+    data->roll = 0.0f;
 
-    data->sample_rate = -1;
+    data->pitch_offset = 0.0f;
+    data->roll_offset = 0.0f;
+
+    data->sample_rate = -1.0;
 
     /* set config register */
     i2c_write_byte(MPU6050_RA_CONFIG, 0x00);
@@ -176,6 +179,7 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     data->gyro->y = data->gyro->raw_y / data->gyro->sensitivity;
     data->gyro->z = data->gyro->raw_z / data->gyro->sensitivity;
 
+
     /* calculate dt */
     time_now = clock();
     dt = ((double) time_now - data->last_updated) / CLOCKS_PER_SEC;
@@ -186,6 +190,10 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     data->roll = (0.98 * data->gyro->roll) + (0.02 * data->accel->roll);
     gyroscope_calc_angle(data, dt);
     /* log_info("--> %f %f", data->pitch, data->roll); */
+
+    /* offset pitch and roll */
+    data->pitch += data->pitch_offset;
+    data->roll += data->roll_offset;
 
     /* set last_updated */
     data->last_updated = clock();
