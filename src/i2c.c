@@ -6,6 +6,7 @@ int i2c_setup(void)
     bcm2835I2CReasonCodes retval;
 
     retval = bcm2835_init();
+    bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626);
     if (retval == 0) {
         log_info("%s", I2C_INIT_FAILED);
         return -1;

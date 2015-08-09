@@ -103,6 +103,8 @@ void *comms_loop(void *arg)
     log_info("connected to %s!", ip);
 
     while (p->state == PIQ_RUN) {
+        mpu6050_data(p->imu);
+
         /* setup */
         memset(buf, '\0', 100);
         sprintf(

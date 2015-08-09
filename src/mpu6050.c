@@ -81,7 +81,7 @@ struct mpu6050_data *mpu6050_setup(void)
     data->sample_rate = mpu6050_get_sample_rate();
 
     /* calibrate mpu6050 */
-    mpu6050_calibrate(data);
+    /* mpu6050_calibrate(data); */
 
     return data;
 }
