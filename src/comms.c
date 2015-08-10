@@ -98,7 +98,7 @@ void *comms_loop(void *arg)
     fd_set readfds;
 
     /* setup */
-    ip = "10.0.0.13";
+    ip = "192.168.1.2";
     port = 8000;
     p = arg;
 

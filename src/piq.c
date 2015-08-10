@@ -37,19 +37,15 @@ void piq_destroy(void *target)
 int main(void)
 {
     struct piq *p;
-    /* pthread_t thread_1; */
-    pthread_t thread_2;
+    pthread_t thread_1;
 
     /* setup */
     log_info("setup");
     i2c_setup();
     p = piq_setup();
 
-    /* thread telemetry and mpu6050 */
-    /* pthread_create(&thread_1, NULL, &mpu6050_loop, (void *) p); */
-    pthread_create(&thread_2, NULL, &comms_loop, (void *) p);
-    /* pthread_join(thread_1, NULL); */
-    pthread_join(thread_2, NULL);
+    pthread_create(&thread_1, NULL, &comms_loop, (void *) p);
+    pthread_join(thread_1, NULL);
 
     /* teardown */
     piq_destroy(p);
