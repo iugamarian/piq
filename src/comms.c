@@ -99,6 +99,7 @@ void *comms_loop(void *arg)
 
     /* setup */
     ip = "192.168.1.2";
+    /* ip = "10.0.0.13"; */
     port = 8000;
     p = arg;
 
@@ -207,6 +208,35 @@ void *comms_loop(void *arg)
             log_info(
                 "increase imu roll offset to %f",
                 p->imu->roll_offset
+            );
+
+        /* PID CALIBRATION */
+        } else if (strcmp(buf, "p") == 0) {
+            p->motors->pitch_pid->k_p += 0.0001;
+            log_info(
+                "increase pitch pid setting to %f",
+                p->motors->pitch_pid->k_p
+            );
+
+        } else if (strcmp(buf, "o") == 0) {
+            p->motors->pitch_pid->k_p -= 0.0001;
+            log_info(
+                "decrease pitch pid setting to %f",
+                p->motors->pitch_pid->k_p
+            );
+
+        } else if (strcmp(buf, "l") == 0) {
+            p->motors->roll_pid->k_p += 0.0001;
+            log_info(
+                "increase pitch pid setting to %f",
+                p->motors->roll_pid->k_p
+            );
+
+        } else if (strcmp(buf, "k") == 0) {
+            p->motors->roll_pid->k_p -= 0.0001;
+            log_info(
+                "decrease pitch pid setting to %f",
+                p->motors->roll_pid->k_p
             );
 
         /* MISC */
