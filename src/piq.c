@@ -19,6 +19,7 @@ struct piq *piq_setup(void)
 
     p = malloc(sizeof(struct piq));
     p->state = PIQ_RUN;
+    p->config = config_setup();
     p->imu = mpu6050_setup();
     p->motors = esc_setup();
 
@@ -29,6 +30,7 @@ void piq_destroy(void *target)
 {
     struct piq *p;
     p = target;
+    config_destroy(p->config);
     mpu6050_destroy(p->imu);
     esc_destroy(p->motors);
     free(p);

@@ -10,6 +10,7 @@
 #include "mpu6050.h"
 #include "pca9685.h"
 #include "comms.h"
+#include "config.h"
 
 
 #define PIQ_STOP 0
@@ -20,6 +21,7 @@
 struct piq
 {
     int state;
+    struct config *config;
     struct mpu6050_data *imu;
     struct esc *motors;
 };

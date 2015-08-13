@@ -28,6 +28,16 @@ void config_destroy(void *target)
     free(c);
 }
 
+struct config *config_setup(void)
+{
+    struct config *c;
+
+    c = config_new();
+    config_load(c, "piq.config");
+
+    return c;
+}
+
 int config_load(struct config *c, const char *file_path)
 {
     char buf[50];

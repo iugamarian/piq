@@ -29,6 +29,7 @@ struct config
 /* FUNCTIONS */
 struct config *config_new(void);
 void config_destroy(void *target);
+struct config *config_setup(void);
 int config_load(struct config *c, const char *file_path);
 void config_info(struct config *c);
 
