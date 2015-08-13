@@ -102,7 +102,7 @@ int fltcmp(float v1, float v2)
     } else if (v1 < v2) {
         return -1;
     } else {
-        log_err("Undefined runtime behaviour!\n");
+        log_err("Undefined runtime behaviour!");
         return -1;
     }
 }

@@ -66,30 +66,22 @@ int pid_calculate(struct pid *p, float actual)
     float dt;
     float error;
 
-    /* pre-check */
-    if (pid_precheck(p) == -1){
-        log_err("pid constant values are zero!");
-        return -1;
-    }
-
-    /* calculate dt */
-    dt = ((double) clock() - p->last_updated) / CLOCKS_PER_SEC;
-
-    /* calculate error */
+    /* calculate proportional error */
     error = p->setpoint - actual;
+    p->output = (p->k_p * error);
 
-    /* calculate derivative and integral errors */
-    if (fabs(error) > p->dead_zone) {
-        p->integral_error += error * dt;
-    }
+    /* calculate derivative errors */
+    dt = ((double) clock() - p->last_updated) / CLOCKS_PER_SEC;
     if (dt) {
         p->derivative_error = (error - p->prev_error) / dt;
     }
-
-    /* calculate output */
-    p->output = (p->k_p * error);
-    p->output += (p->k_i * p->integral_error);
     p->output += (p->k_d * p->derivative_error);
+
+    /* calculate integral errors */
+    if (fabs(error) > p->dead_zone) {
+        p->integral_error += error * dt;
+    }
+    p->output += (p->k_i * p->integral_error);
 
     /* limit boundaries */
     if (p->output > p->bound_max) {
@@ -115,8 +107,8 @@ struct esc *esc_setup(void)
 
     /* setup */
     e = malloc(sizeof(struct esc));
-    e->pitch_pid = pid_setup(0.0f, 0.001f, 0.0f, 0.0f, -90.0f, 90.0f);
-    e->roll_pid = pid_setup(0.0f, 0.001f, 0.0f, 0.0f, -90.0f, 90.0f);
+    e->pitch_pid = pid_setup(0.0f, 0.01f, 0.0f, 0.05f, -90.0f, 90.0f);
+    e->roll_pid = pid_setup(0.0f, 0.01f, 0.0f, 0.05f, -90.0f, 90.0f);
 
     /* calculate min / max duty cycle */
     /* a typical ESC expects a pulse width between 1 to 2ms */
