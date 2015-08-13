@@ -1,28 +1,43 @@
 #include "config.h"
 
 
-struct config *config_load(const char *file_path)
+struct config *config_new(void)
+{
+    struct config *c;
+
+    c = malloc(sizeof(struct config));
+
+    c->pitch_k_p = 0.0f;
+    c->pitch_k_i = 0.0f;
+    c->pitch_k_d = 0.0f;
+
+    c->roll_k_p = 0.0f;
+    c->roll_k_i = 0.0f;
+    c->roll_k_d = 0.0f;
+
+    c->pitch_offset = 0.0f;
+    c->roll_offset = 0.0f;
+
+    return c;
+}
+
+void config_destroy(void *target)
+{
+    struct config *c;
+    c = target;
+    free(c);
+}
+
+int config_load(struct config *c, const char *file_path)
 {
     char buf[50];
     char key[50];
     char val[50];
-    struct config *c;
     FILE *config_fp;
 
-    /* open config file */
+    /* setup */
     config_fp = fopen(file_path, "r");
     check(config_fp != NULL, "failed to open file: %s", file_path);
-
-    /* setup */
-    c = malloc(sizeof(struct config));
-    c->pitch_k_p = 0.0f;
-    c->pitch_k_i = 0.0f;
-    c->pitch_k_d = 0.0f;
-    c->roll_k_p = 0.0f;
-    c->roll_k_i = 0.0f;
-    c->roll_k_d = 0.0f;
-    c->pitch_offset = 0.0f;
-    c->roll_offset = 0.0f;
 
     /* load configuration */
     memset(buf, '\0', 50);
@@ -53,17 +68,11 @@ struct config *config_load(const char *file_path)
     /* clean up */
     fclose(config_fp);
 
-    return c;
+    return 0;
 error:
-    return NULL;
+    return -1;
 }
 
-void config_destroy(void *target)
-{
-    struct config *c;
-    c = target;
-    free(c);
-}
 
 void config_info(struct config *c)
 {

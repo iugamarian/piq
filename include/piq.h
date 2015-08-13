@@ -3,7 +3,6 @@
 
 #include <unistd.h>
 #include <fcntl.h>
-#include <pthread.h>
 
 #include "i2c.h"
 #include "utils.h"

@@ -37,15 +37,14 @@ void piq_destroy(void *target)
 int main(void)
 {
     struct piq *p;
-    pthread_t thread_1;
 
     /* setup */
     log_info("setup");
     i2c_setup();
     p = piq_setup();
 
-    pthread_create(&thread_1, NULL, &comms_loop, (void *) p);
-    pthread_join(thread_1, NULL);
+    /* events loop */
+    comms_loop(p);
 
     /* teardown */
     piq_destroy(p);
