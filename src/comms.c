@@ -211,32 +211,94 @@ void *comms_loop(void *arg)
             );
 
         /* PID CALIBRATION */
-        } else if (strcmp(buf, "p") == 0) {
+        /* PID PITCH k_p */
+        } else if (strcmp(buf, "i") == 0) {
             p->motors->pitch_pid->k_p += 0.0001;
             log_info(
-                "increase pitch pid setting to %f",
+                "increase pitch pid k_p setting to %f",
                 p->motors->pitch_pid->k_p
             );
 
-        } else if (strcmp(buf, "o") == 0) {
+        } else if (strcmp(buf, "I") == 0) {
             p->motors->pitch_pid->k_p -= 0.0001;
             log_info(
-                "decrease pitch pid setting to %f",
+                "decrease pitch pid k_p setting to %f",
                 p->motors->pitch_pid->k_p
             );
 
-        } else if (strcmp(buf, "l") == 0) {
+        /* PID PITCH k_i */
+        } else if (strcmp(buf, "o") == 0) {
+            p->motors->pitch_pid->k_i += 0.0001;
+            log_info(
+                "increase pitch pid k_i setting to %f",
+                p->motors->pitch_pid->k_i
+            );
+
+        } else if (strcmp(buf, "O") == 0) {
+            p->motors->pitch_pid->k_i -= 0.0001;
+            log_info(
+                "decrease pitch pid k_i setting to %f",
+                p->motors->pitch_pid->k_i
+            );
+
+        /* PID PITCH k_d */
+        } else if (strcmp(buf, "p") == 0) {
+            p->motors->pitch_pid->k_d += 0.0001;
+            log_info(
+                "increase pitch pid k_d setting to %f",
+                p->motors->pitch_pid->k_d
+            );
+
+        } else if (strcmp(buf, "P") == 0) {
+            p->motors->pitch_pid->k_i -= 0.0001;
+            log_info(
+                "decrease pitch pid k_d setting to %f",
+                p->motors->pitch_pid->k_d
+            );
+
+        /* PID ROLL k_p */
+        } else if (strcmp(buf, "j") == 0) {
             p->motors->roll_pid->k_p += 0.0001;
             log_info(
-                "increase pitch pid setting to %f",
+                "increase roll pid k_p setting to %f",
                 p->motors->roll_pid->k_p
             );
 
-        } else if (strcmp(buf, "k") == 0) {
+        } else if (strcmp(buf, "J") == 0) {
             p->motors->roll_pid->k_p -= 0.0001;
             log_info(
-                "decrease pitch pid setting to %f",
+                "decrease roll pid k_p setting to %f",
                 p->motors->roll_pid->k_p
+            );
+
+        /* PID ROLL k_i */
+        } else if (strcmp(buf, "k") == 0) {
+            p->motors->roll_pid->k_i += 0.0001;
+            log_info(
+                "increase roll pid k_i setting to %f",
+                p->motors->roll_pid->k_i
+            );
+
+        } else if (strcmp(buf, "K") == 0) {
+            p->motors->roll_pid->k_i -= 0.0001;
+            log_info(
+                "decrease roll pid k_i setting to %f",
+                p->motors->roll_pid->k_i
+            );
+
+        /* PID ROLL k_d */
+        } else if (strcmp(buf, "l") == 0) {
+            p->motors->roll_pid->k_d += 0.0001;
+            log_info(
+                "increase roll pid k_d setting to %f",
+                p->motors->roll_pid->k_d
+            );
+
+        } else if (strcmp(buf, "L") == 0) {
+            p->motors->roll_pid->k_i -= 0.0001;
+            log_info(
+                "decrease roll pid k_d setting to %f",
+                p->motors->roll_pid->k_d
             );
 
         /* MISC */
