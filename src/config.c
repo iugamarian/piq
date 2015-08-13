@@ -7,6 +7,9 @@ struct config *config_new(void)
 
     c = malloc(sizeof(struct config));
 
+    c->mcc_host = NULL;
+    c->mcc_port = -1;
+
     c->pitch_k_p = 0.0f;
     c->pitch_k_i = 0.0f;
     c->pitch_k_d = 0.0f;
@@ -25,6 +28,7 @@ void config_destroy(void *target)
 {
     struct config *c;
     c = target;
+    free(c->mcc_host);
     free(c);
 }
 
@@ -56,7 +60,12 @@ int config_load(struct config *c, const char *file_path)
         memset(val, '\0', sizeof(val));
         sscanf(buf, "%s %s", key, val);
 
-        if (strcmp(key, "pitch.k_p") == 0) {
+        if (strcmp(key, "mcc.host") == 0) {
+            c->mcc_host = malloc(sizeof(char) * (strlen(val) + 1));
+            strcpy(c->mcc_host, val);
+        } else if (strcmp(key, "mcc.port") == 0) {
+            c->mcc_port = atoi(val);
+        } else if (strcmp(key, "pitch.k_p") == 0) {
             c->pitch_k_p = atof(val);
         } else if (strcmp(key, "pitch.k_i") == 0) {
             c->pitch_k_i = atof(val);
@@ -86,6 +95,9 @@ error:
 
 void config_info(struct config *c)
 {
+    printf("mcc.host: %s\n", c->mcc_host);
+    printf("mcc.port: %d\n", c->mcc_port);
+
     printf("pitch.k_p: %f\n", c->pitch_k_p);
     printf("pitch.k_i: %f\n", c->pitch_k_i);
     printf("pitch.k_d: %f\n", c->pitch_k_d);

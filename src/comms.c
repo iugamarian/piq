@@ -87,8 +87,6 @@ int tcp_client_send(struct tcp_client *c, const char *msg)
 
 void *comms_loop(void *arg)
 {
-    char *ip;
-    int port;
     int *retval;
     size_t read_size;
     char buf[100];
@@ -98,14 +96,10 @@ void *comms_loop(void *arg)
     fd_set readfds;
 
     /* setup */
-    ip = "192.168.1.2";
-    /* ip = "10.0.0.13"; */
-    port = 8000;
     p = arg;
-
-    client = tcp_client_new(ip, port);
+    client = tcp_client_new(p->config->mcc_host, p->config->mcc_port);
     silent_check(client != NULL);
-    log_info("connected to %s!", ip);
+    log_info("connected to %s!", p->config->mcc_host);
 
     tv.tv_sec = 0;
     tv.tv_usec = 0;
@@ -145,12 +139,10 @@ void *comms_loop(void *arg)
 
         /* THROTTLE */
         if (strcmp(buf, "]") == 0) {
-            log_info("throttle up");
-            p->motors->throttle += 0.01;
+            esc_throttle_increment(p->motors, 0.01);
 
         } else if (strcmp(buf, "[") == 0) {
-            log_info("throttle down");
-            p->motors->throttle -= 0.01;
+            esc_throttle_decrement(p->motors, 0.01);
 
         /* PID PITCH AND ROLL SET POINT */
         } else if (strcmp(buf, "w") == 0) {
@@ -319,7 +311,7 @@ void *comms_loop(void *arg)
         esc_set_throttles(p->motors, p->imu);
 
     }
-    log_info("disconnected from %s!", ip);
+    log_info("disconnected from %s!", p->config->mcc_host);
     close(client->socket);
 
     retval = malloc(sizeof(int));

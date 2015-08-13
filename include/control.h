@@ -66,5 +66,7 @@ struct esc *esc_setup(void);
 void esc_destroy(void *target);
 void esc_calibrate(struct esc *e);
 void esc_set_throttles(struct esc *e, struct mpu6050_data *imu);
+void esc_throttle_increment(struct esc *e, float inc);
+void esc_throttle_decrement(struct esc *e, float dec);
 
 #endif

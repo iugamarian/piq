@@ -13,6 +13,9 @@
 /* STRUCTURES */
 struct config
 {
+    char *mcc_host;
+    int mcc_port;
+
     float pitch_k_p;
     float pitch_k_i;
     float pitch_k_d;
