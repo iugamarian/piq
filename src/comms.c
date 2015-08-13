@@ -250,7 +250,7 @@ void *comms_loop(void *arg)
             );
 
         } else if (strcmp(buf, "P") == 0) {
-            p->motors->pitch_pid->k_i -= 0.0001;
+            p->motors->pitch_pid->k_d -= 0.0001;
             log_info(
                 "decrease pitch pid k_d setting to %f",
                 p->motors->pitch_pid->k_d
@@ -295,7 +295,7 @@ void *comms_loop(void *arg)
             );
 
         } else if (strcmp(buf, "L") == 0) {
-            p->motors->roll_pid->k_i -= 0.0001;
+            p->motors->roll_pid->k_d -= 0.0001;
             log_info(
                 "decrease roll pid k_d setting to %f",
                 p->motors->roll_pid->k_d

@@ -35,20 +35,18 @@ struct mpu6050_data *mpu6050_setup(void)
 
     data->sample_rate = -1.0;
 
-    /* set config register */
-    i2c_write_byte(MPU6050_RA_CONFIG, 0x00);
-
-    /* set power management register */
-    i2c_write_byte(MPU6050_RA_PWR_MGMT_1, 0x00);
-
-    /* #<{(| set dplf |)}># */
+    /* set dplf */
     mpu6050_set_dplf_config(6);
     retval = mpu6050_get_dplf_config();
     if (retval > 7 || retval < 0) {
         return NULL;
     } else{
         data->dplf_config = retval;
+        log_info("dplf config: %d", data->dplf_config);
     }
+
+    /* set power management register */
+    i2c_write_byte(MPU6050_RA_PWR_MGMT_1, 0x00);
 
     /* get gyro range */
     mpu6050_set_gyro_range(0);
@@ -271,12 +269,14 @@ int8_t mpu6050_get_dplf_config(void)
         return -1;
     }
 
-    return (data[0] & 0b00000111);
+    log_info("GET DPLF: %d", data[0]);
+    data[0] = data[0] & 0b00000111;
+
+    return data[0];
 }
 
 int8_t mpu6050_set_dplf_config(int8_t setting)
 {
-    char data[1];
     int retval;
 
     /*
@@ -312,9 +312,8 @@ int8_t mpu6050_set_dplf_config(int8_t setting)
     }
 
     /* set DPLF */
-    data[0] = setting;
     i2c_set_slave(MPU6050_ADDRESS);
-    retval = i2c_write_bytes(MPU6050_RA_CONFIG, data, 1);
+    retval = i2c_write_byte(MPU6050_RA_CONFIG, (char) setting);
     if (retval != 0) {
         return -1;
     }
