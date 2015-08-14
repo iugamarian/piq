@@ -23,8 +23,7 @@ struct pid *pid_setup(
     p->k_i = k_i;
     p->k_d = k_d;
 
-    p->integral_error = 0.0f;
-    p->derivative_error = 0.0f;
+    p->sum_error = 0.0f;
 
     p->dead_zone = 0.0f;
     p->bound_min = bound_min;
@@ -85,16 +84,13 @@ int pid_calculate(struct pid *p, float actual)
 
     /* calculate derivative and integral errors */
     if (fabs(error) > p->dead_zone) {
-        p->integral_error += error * dt;
-    }
-    if (dt) {
-        p->derivative_error = (error - p->prev_error) / dt;
+        p->sum_error += error * dt;
     }
 
     /* calculate output */
     p->output = (p->k_p * error);
-    p->output += (p->k_i * p->integral_error);
-    p->output += (p->k_d * p->derivative_error);
+    p->output += (p->k_i * p->sum_error);
+    p->output += (p->k_d * (actual - p->prev_error));
 
     /* limit boundaries */
     if (p->output > p->bound_max) {

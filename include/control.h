@@ -22,8 +22,7 @@ struct pid
     float k_i;
     float k_d;
 
-    float integral_error;
-    float derivative_error;
+    float sum_error;
 
     float dead_zone;
     float bound_min;
