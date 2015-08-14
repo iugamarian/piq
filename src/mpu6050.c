@@ -187,7 +187,6 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     data->pitch = (0.98 * data->gyro->pitch) + (0.02 * data->accel->pitch);
     data->roll = (0.98 * data->gyro->roll) + (0.02 * data->accel->roll);
     gyroscope_calc_angle(data, dt);
-    /* log_info("--> %f %f", data->pitch, data->roll); */
 
     /* offset pitch and roll */
     data->pitch += data->pitch_offset;

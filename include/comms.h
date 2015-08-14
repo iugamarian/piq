@@ -16,8 +16,6 @@
 
 
 #include "utils.h"
-#include "mpu6050.h"
-#include "piq.h"
 
 
 /* DEFINES */
@@ -38,8 +36,5 @@ struct tcp_client
 /* FUNCTIONS */
 struct tcp_client *tcp_client_new(const char *host, const int port);
 void tcp_client_destroy(void *target);
-int tcp_client_send(struct tcp_client *c, const char *msg);
-char *tcp_client_recv(struct tcp_client *c);
-void *comms_loop(void *arg);
 
 #endif

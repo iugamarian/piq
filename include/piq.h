@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <pthread.h>
 
 #include "i2c.h"
 #include "utils.h"
@@ -11,6 +12,7 @@
 #include "pca9685.h"
 #include "comms.h"
 #include "config.h"
+
 
 
 #define PIQ_STOP 0

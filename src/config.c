@@ -83,6 +83,7 @@ int config_load(struct config *c, const char *file_path)
             c->roll_offset = atof(val);
         }
     }
+    config_info(c);
 
     /* clean up */
     fclose(config_fp);
