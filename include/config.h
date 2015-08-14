@@ -13,17 +13,27 @@
 /* STRUCTURES */
 struct config
 {
+    /* mcc config */
     char *mcc_host;
     int mcc_port;
 
+    /* pitch pid config */
+    int pitch_sample_rate;
     float pitch_k_p;
     float pitch_k_i;
     float pitch_k_d;
+    float pitch_min;
+    float pitch_max;
 
+    /* roll pid config */
+    int roll_sample_rate;
     float roll_k_p;
     float roll_k_i;
     float roll_k_d;
+    float roll_min;
+    float roll_max;
 
+    /* pitch & roll offset */
     float pitch_offset;
     float roll_offset;
 };
