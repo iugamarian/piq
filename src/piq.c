@@ -8,11 +8,8 @@ struct piq *piq_setup(void)
     p = malloc(sizeof(struct piq));
     p->state = PIQ_RUN;
     p->config = config_setup();
-    p->imu = mpu6050_setup();
-    p->imu->pitch_offset = p->config->pitch_offset;
-    p->imu->roll_offset = p->config->roll_offset;
-    sleep(1);
-    p->motors = esc_setup();
+    p->imu = mpu6050_setup(p->config);
+    p->motors = esc_setup(p->config);
 
     return p;
 }

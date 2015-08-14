@@ -6,6 +6,7 @@
 #include <time.h>
 
 #include "piq.h"
+#include "config.h"
 #include "pca9685.h"
 #include "mpu6050.h"
 
@@ -62,7 +63,7 @@ void pid_destroy(void *target);
 int pid_precheck(struct pid *p);
 int pid_calculate(struct pid *p, float actual);
 /* ESC FUNCTIONS */
-struct esc *esc_setup(void);
+struct esc *esc_setup(struct config *c);
 void esc_destroy(void *target);
 void esc_calibrate(struct esc *e);
 void esc_set_throttles(struct esc *e, struct mpu6050_data *imu);

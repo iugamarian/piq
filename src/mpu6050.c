@@ -1,7 +1,7 @@
 #include "mpu6050.h"
 
 
-struct mpu6050_data *mpu6050_setup(void)
+struct mpu6050_data *mpu6050_setup(struct config *c)
 {
     int8_t retval;
     struct mpu6050_data *data;
@@ -30,8 +30,8 @@ struct mpu6050_data *mpu6050_setup(void)
     data->pitch = 0.0f;
     data->roll = 0.0f;
 
-    data->pitch_offset = 0.0f;
-    data->roll_offset = 0.0f;
+    data->pitch_offset = c->pitch_offset;
+    data->roll_offset = c->roll_offset;
 
     data->sample_rate = -1.0;
 
@@ -497,14 +497,14 @@ int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data)
     return 0;
 }
 
-int mpu6050_brief_recording(char *output_path)
+int mpu6050_brief_recording(char *output_path, struct config *c)
 {
     int8_t retval;
     FILE *output_file;
     struct mpu6050_data *data;
 
     /* setup */
-    data = mpu6050_setup();
+    data = mpu6050_setup(c);
     output_file = fopen(output_path, "w");
 
     /* read values */

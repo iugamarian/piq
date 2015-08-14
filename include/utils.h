@@ -11,6 +11,20 @@
 
 
 /* MACROS */
+#ifdef NDEBUG
+    #define debug(M, ...)
+#else
+    #define debug(M, ...) \
+        fprintf( \
+            stderr, \
+            "[DEBUG] %s:%d: " M "\n", \
+            __func__, \
+            __LINE__, \
+            ##__VA_ARGS__ \
+        )
+#endif
+
+
 #define log_err(M, ...) \
     fprintf(stderr,\
         "[ERROR] (%s:%d) " M "\n",\

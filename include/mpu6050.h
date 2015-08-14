@@ -13,6 +13,7 @@
 #include <bcm2835.h>
 
 #include "i2c.h"
+#include "config.h"
 #include "utils.h"
 
 
@@ -196,7 +197,7 @@ struct mpu6050_data
 
 
 /* FUNCTIONS */
-struct mpu6050_data *mpu6050_setup(void);
+struct mpu6050_data *mpu6050_setup(struct config *c);
 void mpu6050_destroy(void *target);
 int8_t mpu6050_ping(void);
 int8_t mpu6050_data(struct mpu6050_data *data);
@@ -213,7 +214,7 @@ int8_t mpu6050_get_accel_range(void);
 int8_t mpu6050_set_accel_range(int8_t setting);
 void mpu6050_info(struct mpu6050_data *data);
 int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data);
-int mpu6050_brief_recording(char *output_path);
+int mpu6050_brief_recording(char *output_path, struct config *c);
 
 
 #endif

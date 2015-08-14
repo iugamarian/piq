@@ -77,6 +77,11 @@ int pid_calculate(struct pid *p, float actual)
 
     /* calculate error */
     error = p->setpoint - actual;
+    debug("p->setpoint: %f", p->setpoint);
+    debug("actual: %f", actual);
+    debug("error: %f", error);
+    debug("p->prev_error: %f", p->prev_error);
+    debug("dt: %f", dt);
 
     /* calculate derivative and integral errors */
     if (fabs(error) > p->dead_zone) {
@@ -107,7 +112,7 @@ int pid_calculate(struct pid *p, float actual)
 
 
 /* ESC FUNCTIONS */
-struct esc *esc_setup(void)
+struct esc *esc_setup(struct config *c)
 {
     struct esc *e;
     float duty_min;
@@ -115,8 +120,22 @@ struct esc *esc_setup(void)
 
     /* setup */
     e = malloc(sizeof(struct esc));
-    e->pitch_pid = pid_setup(0.0f, 0.01f, 0.0f, 0.0f, -90.0f, 90.0f);
-    e->roll_pid = pid_setup(0.0f, 0.01f, 0.0f, 0.0f, -90.0f, 90.0f);
+    e->pitch_pid = pid_setup(
+        0.0f,
+        c->pitch_k_p,
+        c->pitch_k_i,
+        c->pitch_k_d,
+        -90.0f,
+        90.0f
+    );
+    e->roll_pid = pid_setup(
+        0.0f,
+        c->roll_k_p,
+        c->roll_k_i,
+        c->roll_k_d,
+        -90.0f,
+        90.0f
+    );
 
     /* calculate min / max duty cycle */
     /* a typical ESC expects a pulse width between 1 to 2ms */
