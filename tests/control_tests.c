@@ -32,31 +32,16 @@ int test_pid_calculate()
     int retval;
     int i;
 
-    /* TEST PROPORTIONAL TERM */
-    p = pid_setup(0.0f, 0.0f, 0.0f, 0.01f, -90.0f, 90.0f);
+    /* test */
+    p = pid_setup(0.0f, 0.1f, 0.1f, 0.05f, -90.0f, 90.0f);
     p->output = 1.0f;
     for (i = 0; i < 10; i++) {
+        usleep(100000);
         retval = pid_calculate(p, p->output);
         mu_check(retval == 0);
-        log_info("p->output: %f\n", p->output);
+        log_info("p->output: %f", p->output);
     }
-    /* mu_check(fltcmp(p->output, -1.0f) == 0); */
     pid_destroy(p);
-
-    /* #<{(| TEST INTEGRAL TERM |)}># */
-    /* p = pid_setup(0.0f, 0.0f, 1.0f, 0.0f, -90.0f, 90.0f); */
-    /* retval = pid_calculate(p, 1.0f); */
-    /* mu_check(retval == 0); */
-    /* mu_check(p->output > -0.001f); */
-    /* pid_destroy(p); */
-    /*  */
-    /* #<{(| TEST DERIVATIVE TERM |)}># */
-    /* p = pid_setup(0.0f, 0.0f, 0.0f, 1.0f, -90.0f, 90.0f); */
-    /* sleep(1); */
-    /* retval = pid_calculate(p, 1.0f); */
-    /* mu_check(retval == 0); */
-    /* mu_check(fltcmp(p->output, -90.0f) == 0); */
-    /* pid_destroy(p); */
 
     return 0;
 }

@@ -15,6 +15,7 @@ struct pid *pid_setup(
 
     p = malloc(sizeof(struct pid));
 
+    p->sample_rate = 100;
     p->setpoint = setpoint;
     p->prev_error = 0.0f;
     p->output = 0.0f;
@@ -28,7 +29,7 @@ struct pid *pid_setup(
     p->dead_zone = 0.0f;
     p->bound_min = bound_min;
     p->bound_max = bound_max;
-    p->last_updated = clock();
+    ftime(&p->last_updated);
 
     return p;
 }
@@ -42,66 +43,44 @@ void pid_destroy(void *target)
     p = NULL;
 }
 
-int pid_precheck(struct pid *p)
+int pid_calculate(struct pid *p, float input)
 {
-    int k_p_zero;
-    int k_i_zero;
-    int k_d_zero;
-
-    /* check if k_p, k_i or k_d is 0 */
-    k_p_zero = (fltcmp(p->k_p, 0.0f) == 0) ? 1 : 0;
-    k_i_zero = (fltcmp(p->k_i, 0.0f) == 0) ? 1 : 0;
-    k_d_zero = (fltcmp(p->k_d, 0.0f) == 0) ? 1 : 0;
-
-    if (k_p_zero && k_i_zero && k_d_zero) {
-        return -1;
-    }
-
-    return 0;
-}
-
-int pid_calculate(struct pid *p, float actual)
-{
-    float dt;
+    int dt;
     float error;
+    struct timeb now;
 
-    /* pre-check */
-    if (pid_precheck(p) == -1){
-        log_err("pid constant values are zero!");
-        return -1;
-    }
-
-    /* calculate dt */
-    dt = ((double) clock() - p->last_updated) / CLOCKS_PER_SEC;
-
-    /* calculate error */
-    error = p->setpoint - actual;
-    debug("p->setpoint: %f", p->setpoint);
-    debug("actual: %f", actual);
-    debug("error: %f", error);
-    debug("p->prev_error: %f", p->prev_error);
-    debug("dt: %f", dt);
-
-    /* calculate derivative and integral errors */
-    if (fabs(error) > p->dead_zone) {
-        p->sum_error += error * dt;
-    }
+    /* calculate dt - in miliseconds */
+    ftime(&now);
+    dt = (float) (
+        1000.0 *
+        (now.time - p->last_updated.time) +
+        (now.millitm - p->last_updated.millitm)
+    );
 
     /* calculate output */
-    p->output = (p->k_p * error);
-    p->output += (p->k_i * p->sum_error);
-    p->output += (p->k_d * (actual - p->prev_error));
+    if (dt >= p->sample_rate) {
+        /* calculate errors */
+        error = p->setpoint - input;
+        if (fabs(error) > p->dead_zone) {
+            p->sum_error += error * (float) (dt / 1000.0);
+        }
 
-    /* limit boundaries */
-    if (p->output > p->bound_max) {
-        p->output = p->bound_max;
-    } else if (p->output < p->bound_min) {
-        p->output = p->bound_min;
+        /* calculate output */
+        p->output = (p->k_p * error);
+        p->output += (p->k_i * p->sum_error);
+        p->output -= (p->k_d * (input - p->prev_error));
+
+        /* limit boundaries */
+        if (p->output > p->bound_max) {
+            p->output = p->bound_max;
+        } else if (p->output < p->bound_min) {
+            p->output = p->bound_min;
+        }
+
+        /* update error and last_updated */
+        p->prev_error = error;
+        ftime(&p->last_updated);
     }
-
-    /* update error and last_updated */
-    p->prev_error = error;
-    p->last_updated = clock();
 
     return 0;
 }

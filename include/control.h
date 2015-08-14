@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <sys/timeb.h>
 
 #include "piq.h"
 #include "config.h"
@@ -14,6 +15,7 @@
 /* STRUCTURES */
 struct pid
 {
+    int sample_rate;
     float setpoint;
     float prev_error;
     float output;
@@ -27,7 +29,7 @@ struct pid
     float dead_zone;
     float bound_min;
     float bound_max;
-    clock_t last_updated;
+    struct timeb last_updated;
 };
 
 struct esc
@@ -59,7 +61,6 @@ struct pid *pid_setup(
     float bound_max
 );
 void pid_destroy(void *target);
-int pid_precheck(struct pid *p);
 int pid_calculate(struct pid *p, float actual);
 /* ESC FUNCTIONS */
 struct esc *esc_setup(struct config *c);
