@@ -6,15 +6,15 @@
 #include <pthread.h>
 
 #include "i2c.h"
+#include "esc.h"
 #include "utils.h"
-#include "control.h"
 #include "mpu6050.h"
 #include "pca9685.h"
 #include "comms.h"
 #include "config.h"
 
 
-
+/* STATES */
 #define PIQ_STOP 0
 #define PIQ_RUN 1
 

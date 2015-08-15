@@ -1,8 +1,7 @@
 #!/bin/sh
 make
 # valgrind ./bin/config_tests
-valgrind ./bin/control_tests
-# ./bin/control_tests
+valgrind ./bin/pid_tests
 
 # ./bin/piq
 # python scripts/plot.py
