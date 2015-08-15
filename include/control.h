@@ -16,19 +16,20 @@
 struct pid
 {
     int sample_rate;
+
     float setpoint;
-    float prev_error;
     float output;
+
+    float prev_error;
+    float sum_error;
 
     float k_p;
     float k_i;
     float k_d;
 
-    float sum_error;
-
     float dead_zone;
-    float bound_min;
-    float bound_max;
+    float min;
+    float max;
     struct timeb last_updated;
 };
 
@@ -52,14 +53,7 @@ struct esc
 
 /* FUNCTIONS */
 /* PID FUNCTIONS */
-struct pid *pid_setup(
-    float setpoint,
-    float k_p,
-    float k_i,
-    float k_d,
-    float bound_min,
-    float bound_max
-);
+struct pid *pid_setup(struct pid_config *c);
 void pid_destroy(void *target);
 int pid_calculate(struct pid *p, float actual);
 /* ESC FUNCTIONS */

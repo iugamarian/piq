@@ -11,6 +11,20 @@
 
 
 /* STRUCTURES */
+struct pid_config
+{
+    int sample_rate;
+    float setpoint;
+
+    float k_p;
+    float k_i;
+    float k_d;
+
+    float dead_zone;
+    float min;
+    float max;
+};
+
 struct config
 {
     /* mcc config */
@@ -18,20 +32,8 @@ struct config
     int mcc_port;
 
     /* pitch pid config */
-    int pitch_sample_rate;
-    float pitch_k_p;
-    float pitch_k_i;
-    float pitch_k_d;
-    float pitch_min;
-    float pitch_max;
-
-    /* roll pid config */
-    int roll_sample_rate;
-    float roll_k_p;
-    float roll_k_i;
-    float roll_k_d;
-    float roll_min;
-    float roll_max;
+    struct pid_config pitch;
+    struct pid_config roll;
 
     /* pitch & roll offset */
     float pitch_offset;

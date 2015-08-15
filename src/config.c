@@ -12,20 +12,20 @@ struct config *config_new(void)
     c->mcc_port = -1;
 
     /* pitch pid config */
-    c->pitch_sample_rate = 100;
-    c->pitch_k_p = 0.0f;
-    c->pitch_k_i = 0.0f;
-    c->pitch_k_d = 0.0f;
-    c->pitch_min = -1.0f;
-    c->pitch_max = 1.0f;
+    c->pitch.sample_rate = 100;
+    c->pitch.k_p = 0.0f;
+    c->pitch.k_i = 0.0f;
+    c->pitch.k_d = 0.0f;
+    c->pitch.min = -1.0f;
+    c->pitch.max = 1.0f;
 
     /* roll pid config */
-    c->roll_sample_rate = 100;
-    c->roll_k_p = 0.0f;
-    c->roll_k_i = 0.0f;
-    c->roll_k_d = 0.0f;
-    c->roll_min = -1.0f;
-    c->roll_max = 1.0f;
+    c->roll.sample_rate = 100;
+    c->roll.k_p = 0.0f;
+    c->roll.k_i = 0.0f;
+    c->roll.k_d = 0.0f;
+    c->roll.min = -1.0f;
+    c->roll.max = 1.0f;
 
     /* pitch & roll offset */
     c->pitch_offset = 0.0f;
@@ -79,31 +79,31 @@ int config_load(struct config *c, const char *file_path)
 
         /* PITCH PID */
         } else if (strcmp(key, "pitch.sample_rate") == 0) {
-            c->pitch_sample_rate = atoi(val);
+            c->pitch.sample_rate = atoi(val);
         } else if (strcmp(key, "pitch.k_p") == 0) {
-            c->pitch_k_p = atof(val);
+            c->pitch.k_p = atof(val);
         } else if (strcmp(key, "pitch.k_i") == 0) {
-            c->pitch_k_i = atof(val);
+            c->pitch.k_i = atof(val);
         } else if (strcmp(key, "pitch.k_d") == 0) {
-            c->pitch_k_d = atof(val);
+            c->pitch.k_d = atof(val);
         } else if (strcmp(key, "pitch.min") == 0) {
-            c->pitch_min = atof(val);
+            c->pitch.min = atof(val);
         } else if (strcmp(key, "pitch.max") == 0) {
-            c->pitch_max = atof(val);
+            c->pitch.max = atof(val);
 
         /* ROLL PID */
         } else if (strcmp(key, "roll.sample_rate") == 0) {
-            c->roll_sample_rate = atoi(val);
+            c->roll.sample_rate = atoi(val);
         } else if (strcmp(key, "roll.k_p") == 0) {
-            c->roll_k_p = atof(val);
+            c->roll.k_p = atof(val);
         } else if (strcmp(key, "roll.k_i") == 0) {
-            c->roll_k_i = atof(val);
+            c->roll.k_i = atof(val);
         } else if (strcmp(key, "roll.k_d") == 0) {
-            c->roll_k_d = atof(val);
+            c->roll.k_d = atof(val);
         } else if (strcmp(key, "roll.min") == 0) {
-            c->roll_min = atof(val);
+            c->roll.min = atof(val);
         } else if (strcmp(key, "roll.max") == 0) {
-            c->roll_max = atof(val);
+            c->roll.max = atof(val);
 
         /* PITCH & ROLL OFFSETS */
         } else if (strcmp(key, "pitch.offset") == 0) {
@@ -131,22 +131,22 @@ void config_info(struct config *c)
     printf("\n");
     printf("pitch pid config:\n");
     printf("--------------------\n");
-    printf("pitch.sample_rate : %d\n", c->pitch_sample_rate);
-    printf("pitch.k_p: %f\n", c->pitch_k_p);
-    printf("pitch.k_i: %f\n", c->pitch_k_i);
-    printf("pitch.k_d: %f\n", c->pitch_k_d);
-    printf("pitch.min: %f\n", c->pitch_min);
-    printf("pitch.max: %f\n", c->pitch_max);
+    printf("pitch.sample_rate : %d\n", c->pitch.sample_rate);
+    printf("pitch.k_p: %f\n", c->pitch.k_p);
+    printf("pitch.k_i: %f\n", c->pitch.k_i);
+    printf("pitch.k_d: %f\n", c->pitch.k_d);
+    printf("pitch.min: %f\n", c->pitch.min);
+    printf("pitch.max: %f\n", c->pitch.max);
 
     printf("\n");
     printf("roll pid config:\n");
     printf("--------------------\n");
-    printf("roll.sample_rate : %d\n", c->roll_sample_rate);
-    printf("roll.k_p: %f\n", c->roll_k_p);
-    printf("roll.k_i: %f\n", c->roll_k_i);
-    printf("roll.k_d: %f\n", c->roll_k_d);
-    printf("roll.min: %f\n", c->roll_min);
-    printf("roll.max: %f\n", c->roll_max);
+    printf("roll.sample_rate : %d\n", c->roll.sample_rate);
+    printf("roll.k_p: %f\n", c->roll.k_p);
+    printf("roll.k_i: %f\n", c->roll.k_i);
+    printf("roll.k_d: %f\n", c->roll.k_d);
+    printf("roll.min: %f\n", c->roll.min);
+    printf("roll.max: %f\n", c->roll.max);
 
     printf("\n");
     printf("pitch and roll offsets:\n");
