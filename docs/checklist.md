@@ -1,0 +1,4 @@
+- motors
+- esc
+- raspberry pi
+- kill switch
