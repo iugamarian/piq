@@ -167,10 +167,10 @@ struct accelerometer
     float roll;
 };
 
-struct mpu9250_data
+struct mpu9250
 {
-    struct gyroscope *gyro;
-    struct accelerometer *accel;
+    struct gyroscope gyro;
+    struct accelerometer accel;
 
     float temperature;
     int16_t sample_rate;
@@ -187,12 +187,10 @@ struct mpu9250_data
 
 
 /* FUNCTIONS */
-struct mpu9250_data *mpu9250_setup(void);
-void mpu9250_destroy(void *target);
+struct mpu9250 *mpu9250_setup(void);
 int8_t mpu9250_ping(void);
-/* int8_t mpu9250_data(struct mpu9250_data *data); */
-/* int8_t mpu9250_calibrate(struct mpu9250_data *data); */
-/* void mpu9250_data_print(struct mpu9250_data *data); */
+/* int8_t mpu9250_calibrate(struct mpu9250 *data); */
+/* void mpu9250_print(struct mpu9250 *data); */
 /* int8_t mpu9250_get_dplf_config(void); */
 /* int8_t mpu9250_set_dplf_config(int8_t setting); */
 /* int16_t mpu9250_get_sample_rate(void); */
@@ -202,7 +200,7 @@ int8_t mpu9250_ping(void);
 /* int8_t mpu9250_set_gyro_range(int8_t setting); */
 /* int8_t mpu9250_get_accel_range(void); */
 /* int8_t mpu9250_set_accel_range(int8_t setting); */
-/* void mpu9250_info(struct mpu9250_data *data); */
-/* int8_t mpu9250_record_data(FILE *output_file, struct mpu9250_data *data); */
+/* void mpu9250_info(struct mpu9250 *data); */
+/* int8_t mpu9250_record_data(FILE *output_file, struct mpu9250 *data); */
 
 #endif

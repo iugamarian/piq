@@ -1,99 +1,24 @@
 #include "mpu9250.h"
 
 
-struct mpu9250_data *mpu9250_setup(void)
+void mpu9250_setup(struct mpu9250 *imu)
 {
-    int8_t retval;
-    struct mpu9250_data *data;
+    imu->gyro.offset_x = 0.0f;
+    imu->gyro.offset_y = 0.0f;
+    imu->gyro.offset_z = 0.0f;
+    imu->gyro.pitch = 0.0f;
+    imu->gyro.roll = 0.0f;
 
-    /* setup */
-    log_info("initializing MPU9250");
-    i2c_set_slave(MPU9250_ADDRESS);
+    imu->accel.offset_x = 0.0f;
+    imu->accel.offset_y = 0.0f;
+    imu->accel.offset_z = 0.0f;
+    imu->accel.pitch = 0.0f;
+    imu->accel.roll = 0.0f;
 
-    data = malloc(sizeof(struct mpu9250_data));
-    data->gyro = malloc(sizeof(struct gyroscope));
-    data->accel = malloc(sizeof(struct accelerometer));
+    imu->pitch = 0.0f;
+    imu->roll = 0.0f;
 
-    /* set intial values */
-    data->gyro->offset_x = 0.0f;
-    data->gyro->offset_y = 0.0f;
-    data->gyro->offset_z = 0.0f;
-    data->gyro->pitch = 0.0f;
-    data->gyro->roll = 0.0f;
-
-    data->accel->offset_x = 0.0f;
-    data->accel->offset_y = 0.0f;
-    data->accel->offset_z = 0.0f;
-    data->accel->pitch = 0.0f;
-    data->accel->roll = 0.0f;
-
-    data->pitch = 0.0f;
-    data->roll = 0.0f;
-
-    data->pitch_offset = c->pitch_offset;
-    data->roll_offset = c->roll_offset;
-
-    data->sample_rate = -1.0;
-
-    /* #<{(| set dplf |)}># */
-    /* mpu9250_set_dplf_config(6); */
-    /* retval = mpu9250_get_dplf_config(); */
-    /* if (retval > 7 || retval < 0) { */
-    /*     return NULL; */
-    /* } else{ */
-    /*     data->dplf_config = retval; */
-    /*     log_info("dplf config: %d", data->dplf_config); */
-    /* } */
-
-    /* set power management register */
-    /* i2c_write_byte(MPU9250_RA_PWR_MGMT_1, 0x00); */
-
-    /* get gyro range */
-    /* mpu9250_set_gyro_range(0); */
-    /* retval = mpu9250_get_gyro_range(); */
-    /* if (retval == 0) { */
-    /*     data->gyro->sensitivity = 131.0; */
-    /* } else if (retval == 1) { */
-    /*     data->gyro->sensitivity = 65.5; */
-    /* } else if (retval == 2) { */
-    /*     data->gyro->sensitivity = 32.8; */
-    /* } else if (retval == 3) { */
-    /*     data->gyro->sensitivity = 16.4; */
-    /* } else { */
-    /*     return NULL; */
-    /* } */
-
-    /* get accel range */
-    /* mpu9250_set_accel_range(0); */
-    /* retval = mpu9250_get_accel_range(); */
-    /* if (retval == 0) { */
-    /*     data->accel->sensitivity = 16384.0; */
-    /* } else if (retval == 1) { */
-    /*     data->accel->sensitivity = 8192.0; */
-    /* } else if (retval == 2) { */
-    /*     data->accel->sensitivity = 4096.0; */
-    /* } else if (retval == 3) { */
-    /*     data->accel->sensitivity = 2048.0; */
-    /* } else { */
-    /*     return NULL; */
-    /* } */
-
-    /* get sample rate */
-    /* data->sample_rate = mpu9250_get_sample_rate(); */
-
-    /* calibrate mpu9250 */
-    /* mpu9250_calibrate(data); */
-
-    return data;
-}
-
-void mpu9250_destroy(void *target)
-{
-    struct mpu9250_data *data;
-    data = target;
-    free(data->gyro);
-    free(data->accel);
-    free(data);
+    imu->sample_rate = -1.0;
 }
 
 int8_t mpu9250_ping(void)
@@ -106,7 +31,7 @@ int8_t mpu9250_ping(void)
     i2c_read_bytes(MPU9250_RA_WHO_AM_I, data, 1);
     printf("MPU9250 ADDRESS: 0x%02X\n", data[0]);
 
-    return 0;
+    return data[0];
 }
 
 /* static void accelerometer_calc_angle(struct mpu9250_data *data) */
