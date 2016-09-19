@@ -28,7 +28,7 @@ int8_t mpu9250_ping(void)
     /* print mpu9250 address */
     data[0] = 0x00;
     i2c_set_slave(MPU9250_ADDRESS);
-    i2c_read_bytes(MPU9250_RA_WHO_AM_I, data, 1);
+    i2c_read_bytes(MPU9250_WHO_AM_I, data, 1);
     printf("MPU9250 ADDRESS: 0x%02X\n", data[0]);
 
     return data[0];

@@ -36,6 +36,7 @@ int test_mpu9250_setup(void)
 
 int test_mpu9250_ping(void)
 {
+    i2c_setup();
     mpu9250_ping();
     return 0;
 }

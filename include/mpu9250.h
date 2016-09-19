@@ -187,7 +187,7 @@ struct mpu9250
 
 
 /* FUNCTIONS */
-struct mpu9250 *mpu9250_setup(void);
+void mpu9250_setup(struct mpu9250 *imu);
 int8_t mpu9250_ping(void);
 /* int8_t mpu9250_calibrate(struct mpu9250 *data); */
 /* void mpu9250_print(struct mpu9250 *data); */
