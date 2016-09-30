@@ -1,7 +1,6 @@
 #ifndef __MPU6050_H__
 #define __MPU6050_H__
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,11 +9,9 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <bcm2835.h>
-
-#include "i2c.h"
 #include "config.h"
-#include "utils.h"
+#include "imu/imu.h"
+#include "comm/i2c.h"
 
 
 /* GENERAL */
@@ -135,9 +132,8 @@
 #define MPU6050_RA_WHO_AM_I             0x75
 
 
-
 /* STRUCTURES */
-struct gyroscope
+struct mpu6050_gyroscope
 {
     float sensitivity;
 
@@ -157,7 +153,7 @@ struct gyroscope
     float roll;
 };
 
-struct accelerometer
+struct mpu6050_accelerometer
 {
     float sensitivity;
 
@@ -179,13 +175,10 @@ struct accelerometer
 
 struct mpu6050_data
 {
-    struct gyroscope *gyro;
-    struct accelerometer *accel;
+    struct mpu6050_gyroscope gyro;
+    struct mpu6050_accelerometer accel;
 
     float temperature;
-    int16_t sample_rate;
-    int8_t dplf_config;
-
     float pitch;
     float roll;
 
@@ -193,12 +186,14 @@ struct mpu6050_data
     float roll_offset;
 
     clock_t last_updated;
+    int16_t sample_rate;
+    int8_t dplf_config;
 };
 
 
+
 /* FUNCTIONS */
-struct mpu6050_data *mpu6050_setup(struct config *c);
-void mpu6050_destroy(void *target);
+int8_t mpu6050_setup(struct mpu6050_data *data);
 int8_t mpu6050_ping(void);
 int8_t mpu6050_data(struct mpu6050_data *data);
 int8_t mpu6050_calibrate(struct mpu6050_data *data);
@@ -214,7 +209,6 @@ int8_t mpu6050_get_accel_range(void);
 int8_t mpu6050_set_accel_range(int8_t setting);
 void mpu6050_info(struct mpu6050_data *data);
 int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data);
-int mpu6050_brief_recording(char *output_path, struct config *c);
-
+int8_t mpu6050_record(char *output_path, int nb_samples);
 
 #endif

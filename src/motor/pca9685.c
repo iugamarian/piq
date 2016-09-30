@@ -1,4 +1,4 @@
-#include "pca9685.h"
+#include "motor/pca9685.h"
 
 
 void pca9685_setup(int freq)

@@ -15,7 +15,7 @@
 #include <arpa/inet.h>
 
 
-#include "utils.h"
+#include "util.h"
 
 
 /* DEFINES */

@@ -4,10 +4,10 @@
 #include <stdlib.h>
 
 #include "piq.h"
-#include "pid.h"
 #include "config.h"
-#include "pca9685.h"
-#include "mpu6050.h"
+#include "imu/imu.h"
+#include "motor/pca9685.h"
+#include "controller/pid.h"
 
 
 /* STRUCTURES */
@@ -33,7 +33,7 @@ struct esc
 struct esc *esc_setup(struct config *c);
 void esc_destroy(void *target);
 void esc_calibrate(struct esc *e);
-void esc_set_throttles(struct esc *e, struct mpu6050_data *imu);
+void esc_set_throttles(struct esc *e, struct imu *imu);
 void esc_throttle_increment(struct esc *e, float inc);
 void esc_throttle_decrement(struct esc *e, float dec);
 

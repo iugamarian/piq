@@ -5,12 +5,13 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-#include "i2c.h"
-#include "esc.h"
-#include "utils.h"
-#include "mpu6050.h"
-#include "pca9685.h"
-#include "comms.h"
+#include "util.h"
+#include "imu/imu.h"
+#include "imu/mpu6050.h"
+#include "motor/esc.h"
+#include "motor/pca9685.h"
+#include "comm/comm.h"
+#include "comm/i2c.h"
 #include "config.h"
 
 
@@ -24,15 +25,13 @@ struct piq
 {
     int state;
     struct config *config;
-    struct mpu6050_data *imu;
+    struct imu imu;
     struct esc *motors;
 };
 
 
 /* FUNCTIONS */
-void *mpu6050_loop(void *arg);
-struct piq *piq_setup(void);
-void piq_destroy(void *target);
+void piq_setup(struct piq *p);
 
 
 #endif

@@ -1,46 +1,44 @@
-#include "mpu6050.h"
+#include "imu/mpu6050.h"
 
 
-struct mpu6050_data *mpu6050_setup(struct config *c)
+int8_t mpu6050_setup(struct mpu6050_data *data)
 {
     int8_t retval;
-    struct mpu6050_data *data;
 
     /* setup */
     log_info("initializing mpu6050");
     i2c_set_slave(MPU6050_ADDRESS);
 
-    data = malloc(sizeof(struct mpu6050_data));
-    data->gyro = malloc(sizeof(struct gyroscope));
-    data->accel = malloc(sizeof(struct accelerometer));
-
     /* set intial values */
-    data->gyro->offset_x = 0.0f;
-    data->gyro->offset_y = 0.0f;
-    data->gyro->offset_z = 0.0f;
-    data->gyro->pitch = 0.0f;
-    data->gyro->roll = 0.0f;
+    data->gyro.offset_x = 0.0f;
+    data->gyro.offset_y = 0.0f;
+    data->gyro.offset_z = 0.0f;
+    data->gyro.pitch = 0.0f;
+    data->gyro.roll = 0.0f;
 
-    data->accel->offset_x = 0.0f;
-    data->accel->offset_y = 0.0f;
-    data->accel->offset_z = 0.0f;
-    data->accel->pitch = 0.0f;
-    data->accel->roll = 0.0f;
+    data->accel.offset_x = 0.0f;
+    data->accel.offset_y = 0.0f;
+    data->accel.offset_z = 0.0f;
+    data->accel.pitch = 0.0f;
+    data->accel.roll = 0.0f;
 
+    data->pitch_offset = 0.0f;
+    data->roll_offset = 0.0f;
+
+    data->temperature = 0.0f;
     data->pitch = 0.0f;
     data->roll = 0.0f;
 
-    data->pitch_offset = c->pitch_offset;
-    data->roll_offset = c->roll_offset;
-
+    data->last_updated = clock();
     data->sample_rate = -1.0;
+    data->dplf_config = 0;
 
     /* set dplf */
     mpu6050_set_dplf_config(6);
     retval = mpu6050_get_dplf_config();
     if (retval > 7 || retval < 0) {
-        return NULL;
-    } else{
+        return -1;
+    } else {
         data->dplf_config = retval;
         log_info("dplf config: %d", data->dplf_config);
     }
@@ -52,30 +50,30 @@ struct mpu6050_data *mpu6050_setup(struct config *c)
     mpu6050_set_gyro_range(0);
     retval = mpu6050_get_gyro_range();
     if (retval == 0) {
-        data->gyro->sensitivity = 131.0;
+        data->gyro.sensitivity = 131.0;
     } else if (retval == 1) {
-        data->gyro->sensitivity = 65.5;
+        data->gyro.sensitivity = 65.5;
     } else if (retval == 2) {
-        data->gyro->sensitivity = 32.8;
+        data->gyro.sensitivity = 32.8;
     } else if (retval == 3) {
-        data->gyro->sensitivity = 16.4;
+        data->gyro.sensitivity = 16.4;
     } else {
-        return NULL;
+        return -2;
     }
 
     /* get accel range */
     mpu6050_set_accel_range(0);
     retval = mpu6050_get_accel_range();
     if (retval == 0) {
-        data->accel->sensitivity = 16384.0;
+        data->accel.sensitivity = 16384.0;
     } else if (retval == 1) {
-        data->accel->sensitivity = 8192.0;
+        data->accel.sensitivity = 8192.0;
     } else if (retval == 2) {
-        data->accel->sensitivity = 4096.0;
+        data->accel.sensitivity = 4096.0;
     } else if (retval == 3) {
-        data->accel->sensitivity = 2048.0;
+        data->accel.sensitivity = 2048.0;
     } else {
-        return NULL;
+        return -3;
     }
 
     /* get sample rate */
@@ -84,16 +82,7 @@ struct mpu6050_data *mpu6050_setup(struct config *c)
     /* calibrate mpu6050 */
     /* mpu6050_calibrate(data); */
 
-    return data;
-}
-
-void mpu6050_destroy(void *target)
-{
-    struct mpu6050_data *data;
-    data = target;
-    free(data->gyro);
-    free(data->accel);
-    free(data);
+    return 0;
 }
 
 int8_t mpu6050_ping(void)
@@ -116,19 +105,19 @@ static void accelerometer_calc_angle(struct mpu6050_data *data)
     float z;
 
     /* setup */
-    x = data->accel->x;
-    y = data->accel->y;
-    z = data->accel->z;
+    x = data->accel.x;
+    y = data->accel.y;
+    z = data->accel.z;
 
     /* calculate pitch and roll */
-    data->accel->pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
-    data->accel->roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
+    data->accel.pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
+    data->accel.roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
 }
 
 static void gyroscope_calc_angle(struct mpu6050_data *data, float dt)
 {
-    data->gyro->roll = (data->gyro->x * dt) + data->roll;
-    data->gyro->pitch = (data->gyro->y * dt) + data->pitch;
+    data->gyro.roll = (data->gyro.x * dt) + data->roll;
+    data->gyro.pitch = (data->gyro.y * dt) + data->pitch;
 }
 
 int8_t mpu6050_data(struct mpu6050_data *data)
@@ -148,34 +137,34 @@ int8_t mpu6050_data(struct mpu6050_data *data)
     }
 
     /* accelerometer */
-    data->accel->raw_x = (raw_data[0] << 8) | (raw_data[1]);
-    data->accel->raw_y = (raw_data[2] << 8) | (raw_data[3]);
-    data->accel->raw_z = (raw_data[4] << 8) | (raw_data[5]);
+    data->accel.raw_x = (raw_data[0] << 8) | (raw_data[1]);
+    data->accel.raw_y = (raw_data[2] << 8) | (raw_data[3]);
+    data->accel.raw_z = (raw_data[4] << 8) | (raw_data[5]);
 
-    data->accel->raw_x -= data->accel->offset_x;
-    data->accel->raw_y -= data->accel->offset_y;
-    data->accel->raw_z -= data->accel->offset_z;
+    data->accel.raw_x -= data->accel.offset_x;
+    data->accel.raw_y -= data->accel.offset_y;
+    data->accel.raw_z -= data->accel.offset_z;
 
-    data->accel->x = data->accel->raw_x / data->accel->sensitivity;
-    data->accel->y = data->accel->raw_y / data->accel->sensitivity;
-    data->accel->z = data->accel->raw_z / data->accel->sensitivity;
+    data->accel.x = data->accel.raw_x / data->accel.sensitivity;
+    data->accel.y = data->accel.raw_y / data->accel.sensitivity;
+    data->accel.z = data->accel.raw_z / data->accel.sensitivity;
 
     /* temperature */
     raw_temp = (raw_data[6] << 8) | (raw_data[7]);
     data->temperature = raw_temp / 340.0 + 36.53;
 
     /* gyroscope */
-    data->gyro->raw_x = (raw_data[8] << 8) | (raw_data[9]);
-    data->gyro->raw_y = (raw_data[10] << 8) | (raw_data[11]);
-    data->gyro->raw_z = (raw_data[12] << 8) | (raw_data[13]);
+    data->gyro.raw_x = (raw_data[8] << 8) | (raw_data[9]);
+    data->gyro.raw_y = (raw_data[10] << 8) | (raw_data[11]);
+    data->gyro.raw_z = (raw_data[12] << 8) | (raw_data[13]);
 
-    data->gyro->raw_x -= data->gyro->offset_x;
-    data->gyro->raw_y -= data->gyro->offset_y;
-    data->gyro->raw_z -= data->gyro->offset_z;
+    data->gyro.raw_x -= data->gyro.offset_x;
+    data->gyro.raw_y -= data->gyro.offset_y;
+    data->gyro.raw_z -= data->gyro.offset_z;
 
-    data->gyro->x = data->gyro->raw_x / data->gyro->sensitivity;
-    data->gyro->y = data->gyro->raw_y / data->gyro->sensitivity;
-    data->gyro->z = data->gyro->raw_z / data->gyro->sensitivity;
+    data->gyro.x = data->gyro.raw_x / data->gyro.sensitivity;
+    data->gyro.y = data->gyro.raw_y / data->gyro.sensitivity;
+    data->gyro.z = data->gyro.raw_z / data->gyro.sensitivity;
 
 
     /* calculate dt */
@@ -184,8 +173,8 @@ int8_t mpu6050_data(struct mpu6050_data *data)
 
     /* complimentary filter */
     accelerometer_calc_angle(data);
-    data->pitch = (0.98 * data->gyro->pitch) + (0.02 * data->accel->pitch);
-    data->roll = (0.98 * data->gyro->roll) + (0.02 * data->accel->roll);
+    data->pitch = (0.98 * data->gyro.pitch) + (0.02 * data->accel.pitch);
+    data->roll = (0.98 * data->gyro.roll) + (0.02 * data->accel.roll);
     gyroscope_calc_angle(data, dt);
 
     /* offset pitch and roll */
@@ -212,21 +201,21 @@ int8_t mpu6050_calibrate(struct mpu6050_data *data)
     for (i = 0; i < 5000; i++) {
         mpu6050_data(data);
 
-        data->accel->offset_x += data->accel->raw_x;
-        data->accel->offset_y += data->accel->raw_y;
-        data->accel->offset_z += data->accel->raw_z;
+        data->accel.offset_x += data->accel.raw_x;
+        data->accel.offset_y += data->accel.raw_y;
+        data->accel.offset_z += data->accel.raw_z;
 
-        data->accel->offset_x = data->accel->offset_x / 2.0;
-        data->accel->offset_y = data->accel->offset_y / 2.0;
-        data->accel->offset_z = data->accel->offset_z / 2.0;
+        data->accel.offset_x = data->accel.offset_x / 2.0;
+        data->accel.offset_y = data->accel.offset_y / 2.0;
+        data->accel.offset_z = data->accel.offset_z / 2.0;
 
-        data->gyro->offset_x += data->gyro->raw_x;
-        data->gyro->offset_y += data->gyro->raw_y;
-        data->gyro->offset_z += data->gyro->raw_z;
+        data->gyro.offset_x += data->gyro.raw_x;
+        data->gyro.offset_y += data->gyro.raw_y;
+        data->gyro.offset_z += data->gyro.raw_z;
 
-        data->gyro->offset_x = data->gyro->offset_x / 2.0;
-        data->gyro->offset_y = data->gyro->offset_y / 2.0;
-        data->gyro->offset_z = data->gyro->offset_z / 2.0;
+        data->gyro.offset_x = data->gyro.offset_x / 2.0;
+        data->gyro.offset_y = data->gyro.offset_y / 2.0;
+        data->gyro.offset_z = data->gyro.offset_z / 2.0;
     }
 
     return 0;
@@ -234,20 +223,20 @@ int8_t mpu6050_calibrate(struct mpu6050_data *data)
 
 void mpu6050_data_print(struct mpu6050_data *data)
 {
-    printf("gyro_x: %f\n", data->gyro->x);
-    printf("gyro_y: %f\n", data->gyro->y);
-    printf("gyro_z: %f\n", data->gyro->z);
+    printf("gyro_x: %f\n", data->gyro.x);
+    printf("gyro_y: %f\n", data->gyro.y);
+    printf("gyro_z: %f\n", data->gyro.z);
 
-    printf("accel x: %f\n", data->accel->x);
-    printf("accel y: %f\n", data->accel->y);
-    printf("accel z: %f\n", data->accel->z);
+    printf("accel x: %f\n", data->accel.x);
+    printf("accel y: %f\n", data->accel.y);
+    printf("accel z: %f\n", data->accel.z);
 
     printf("\n");
-    printf("accel pitch: %f\n", data->accel->pitch);
-    printf("accel roll: %f\n", data->accel->roll);
+    printf("accel pitch: %f\n", data->accel.pitch);
+    printf("accel roll: %f\n", data->accel.roll);
     printf("\n");
-    printf("gyro pitch: %f\n", data->gyro->pitch);
-    printf("gyro roll: %f\n", data->gyro->roll);
+    printf("gyro pitch: %f\n", data->gyro.pitch);
+    printf("gyro roll: %f\n", data->gyro.roll);
     printf("\n");
 
     printf("temp: %f\n", data->temperature);
@@ -463,15 +452,15 @@ int8_t mpu6050_set_accel_range(int8_t range)
 
 void mpu6050_info(struct mpu6050_data *data)
 {
-    printf("gyro sensitivity: %f\n", data->gyro->sensitivity);
-    printf("gyro offset_x: %f\n", data->gyro->offset_x);
-    printf("gyro offset_y: %f\n", data->gyro->offset_y);
-    printf("gyro offset_z: %f\n", data->gyro->offset_z);
+    printf("gyro sensitivity: %f\n", data->gyro.sensitivity);
+    printf("gyro offset_x: %f\n", data->gyro.offset_x);
+    printf("gyro offset_y: %f\n", data->gyro.offset_y);
+    printf("gyro offset_z: %f\n", data->gyro.offset_z);
     printf("\n");
-    printf("accel sensitivity: %f\n", data->accel->sensitivity);
-    printf("accel offset_x: %f\n", data->accel->offset_x);
-    printf("accel offset_y: %f\n", data->accel->offset_y);
-    printf("accel offset_z: %f\n", data->accel->offset_z);
+    printf("accel sensitivity: %f\n", data->accel.sensitivity);
+    printf("accel offset_x: %f\n", data->accel.offset_x);
+    printf("accel offset_y: %f\n", data->accel.offset_y);
+    printf("accel offset_z: %f\n", data->accel.offset_z);
     printf("\n");
     printf("sample rate: %d\n", data->sample_rate);
     printf("\n");
@@ -479,17 +468,17 @@ void mpu6050_info(struct mpu6050_data *data)
 
 int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data)
 {
-    fprintf(output_file, "%f,", data->gyro->x);
-    fprintf(output_file, "%f,", data->gyro->y);
-    fprintf(output_file, "%f,", data->gyro->z);
-    fprintf(output_file, "%f,", data->gyro->pitch);
-    fprintf(output_file, "%f,", data->gyro->roll);
+    fprintf(output_file, "%f,", data->gyro.x);
+    fprintf(output_file, "%f,", data->gyro.y);
+    fprintf(output_file, "%f,", data->gyro.z);
+    fprintf(output_file, "%f,", data->gyro.pitch);
+    fprintf(output_file, "%f,", data->gyro.roll);
 
-    fprintf(output_file, "%f,", data->accel->x);
-    fprintf(output_file, "%f,", data->accel->y);
-    fprintf(output_file, "%f,", data->accel->z);
-    fprintf(output_file, "%f,", data->accel->pitch);
-    fprintf(output_file, "%f,", data->accel->roll);
+    fprintf(output_file, "%f,", data->accel.x);
+    fprintf(output_file, "%f,", data->accel.y);
+    fprintf(output_file, "%f,", data->accel.z);
+    fprintf(output_file, "%f,", data->accel.pitch);
+    fprintf(output_file, "%f,", data->accel.roll);
 
     fprintf(output_file, "%f,", data->pitch);
     fprintf(output_file, "%f\n", data->roll);
@@ -497,45 +486,37 @@ int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data)
     return 0;
 }
 
-int mpu6050_brief_recording(char *output_path, struct config *c)
+int8_t mpu6050_record(char *output_path, int nb_samples)
 {
+    int i;
     int8_t retval;
     FILE *output_file;
-    struct mpu6050_data *data;
+    struct mpu6050_data data;
 
     /* setup */
-    data = mpu6050_setup(c);
+    mpu6050_setup(&data);
     output_file = fopen(output_path, "w");
 
     /* read values */
     log_info("MPU6050 brief recording");
 
-    int i = 0;
-    while (1) {
+    for (i = 0; i < nb_samples; i++) {
         /* get data */
-        retval = mpu6050_data(data);
+        retval = mpu6050_data(&data);
         if (retval == -1) {
             log_err("failed to obtain data from MPU6050!");
             return -1;
         }
 
         /* record data */
-        mpu6050_record_data(output_file, data);
-
+        mpu6050_record_data(output_file, &data);
         if (retval == -1) {
             log_err("failed to record MPU6050 data!");
             return -1;
         }
-
-        if (i == 10000) {
-            break;
-        }
-
-        i++;
     }
 
     /* clean up */
-    mpu6050_destroy(data);
     fclose(output_file);
 
     return 0;

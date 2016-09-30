@@ -1,4 +1,4 @@
-#include "pid.h"
+#include "controller/pid.h"
 
 
 struct pid *pid_setup(struct pid_config *c)

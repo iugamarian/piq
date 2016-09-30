@@ -1,6 +1,6 @@
 #include "munit.h"
-#include "utils.h"
-#include "esc.h"
+#include "motor/esc.h"
+#include "controller/pid.h"
 
 
 /* PROTOTYPES */

@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <math.h>
 
-#include "utils.h"
+#include "util.h"
 
 
 /* STRUCTURES */

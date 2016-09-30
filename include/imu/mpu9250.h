@@ -1,20 +1,7 @@
 #ifndef __MPU9250_H__
 #define __MPU9250_H__
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <float.h>
-#include <time.h>
-#include <unistd.h>
-
-#include <bcm2835.h>
-
-#include "i2c.h"
-#include "config.h"
-#include "utils.h"
+#include "comm/i2c.h"
 
 
 /* GENERAL */
@@ -127,7 +114,7 @@
 
 
 /* STRUCTURES */
-struct gyroscope
+struct mpu9250_gyroscope
 {
     float sensitivity;
 
@@ -147,7 +134,7 @@ struct gyroscope
     float roll;
 };
 
-struct accelerometer
+struct mpu9250_accelerometer
 {
     float sensitivity;
 
@@ -167,15 +154,32 @@ struct accelerometer
     float roll;
 };
 
-struct mpu9250
+struct mpu9250_magnetometer
 {
-    struct gyroscope gyro;
-    struct accelerometer accel;
+    float sensitivity;
+
+    int16_t raw_x;
+    int16_t raw_y;
+    int16_t raw_z;
+
+    float offset_x;
+    float offset_y;
+    float offset_z;
+
+    float x;
+    float y;
+    float z;
+
+    float heading;
+};
+
+struct mpu9250_data
+{
+    struct mpu9250_gyroscope gyro;
+    struct mpu9250_accelerometer accel;
+    struct mpu9250_magnetometer mag;
 
     float temperature;
-    int16_t sample_rate;
-    int8_t dplf_config;
-
     float pitch;
     float roll;
 
@@ -183,24 +187,12 @@ struct mpu9250
     float roll_offset;
 
     clock_t last_updated;
+    float sample_rate;
 };
 
 
 /* FUNCTIONS */
-void mpu9250_setup(struct mpu9250 *imu);
+void mpu9250_setup(struct mpu9250_data *data);
 int8_t mpu9250_ping(void);
-/* int8_t mpu9250_calibrate(struct mpu9250 *data); */
-/* void mpu9250_print(struct mpu9250 *data); */
-/* int8_t mpu9250_get_dplf_config(void); */
-/* int8_t mpu9250_set_dplf_config(int8_t setting); */
-/* int16_t mpu9250_get_sample_rate(void); */
-/* int8_t mpu9250_get_sample_rate_div(void); */
-/* int8_t mpu9250_set_sample_rate_div(int8_t setting); */
-/* int8_t mpu9250_get_gyro_range(void); */
-/* int8_t mpu9250_set_gyro_range(int8_t setting); */
-/* int8_t mpu9250_get_accel_range(void); */
-/* int8_t mpu9250_set_accel_range(int8_t setting); */
-/* void mpu9250_info(struct mpu9250 *data); */
-/* int8_t mpu9250_record_data(FILE *output_file, struct mpu9250 *data); */
 
 #endif

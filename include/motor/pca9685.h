@@ -4,8 +4,8 @@
 #include "unistd.h"
 #include "math.h"
 
-#include "i2c.h"
-#include "utils.h"
+#include "util.h"
+#include "comm/i2c.h"
 
 
 /* REGISTERS */

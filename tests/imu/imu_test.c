@@ -1,18 +1,17 @@
 #include "munit.h"
-#include "mpu9250.h"
+#include "imu/imu.h"
 
 
 /* PROTOTYPES */
-int test_mpu9250_setup(void);
-int test_mpu9250_ping(void);
+int test_imu_setup(void);
 void test_suite(void);
 
 
-int test_mpu9250_setup(void)
+int test_imu_setup(void)
 {
-    struct mpu9250 imu;
+    struct imu imu;
 
-    mpu9250_setup(&imu);
+    imu_setup(&imu);
 
     mu_check(fltcmp(imu.gyro.offset_x, 0.0f) == 0);
     mu_check(fltcmp(imu.gyro.offset_y, 0.0f) == 0);
@@ -34,17 +33,9 @@ int test_mpu9250_setup(void)
     return 0;
 }
 
-int test_mpu9250_ping(void)
-{
-    i2c_setup();
-    mpu9250_ping();
-    return 0;
-}
-
 void test_suite()
 {
-    mu_add_test(test_mpu9250_setup);
-    mu_add_test(test_mpu9250_ping);
+    mu_add_test(test_imu_setup);
 }
 
 mu_run_tests(test_suite)

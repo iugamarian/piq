@@ -5,7 +5,13 @@ SRCS = $(filter-out piq.c, $(wildcard *.c))
 OBJS = $(SRCS:.c=.o)
 
 
-default: libpiq piq
+default: subdirs libpiq piq
+
+subdirs:
+	make -s -C comm
+	make -s -C controller
+	make -s -C imu
+	# make -s -C motor
 
 %.o: %.c
 	$(MAKE_OBJ)

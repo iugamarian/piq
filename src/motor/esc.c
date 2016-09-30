@@ -1,4 +1,4 @@
-#include "esc.h"
+#include "motor/esc.h"
 
 
 struct esc *esc_setup(struct config *c)
@@ -64,7 +64,7 @@ void esc_calibrate(struct esc *e)
     sleep(3);
 }
 
-void esc_set_throttles(struct esc *e, struct mpu6050_data *imu)
+void esc_set_throttles(struct esc *e, struct imu *imu)
 {
     pid_calculate(e->pitch_pid, imu->pitch);
     pid_calculate(e->roll_pid, imu->roll);
@@ -82,12 +82,10 @@ void esc_set_throttles(struct esc *e, struct mpu6050_data *imu)
 
 void esc_throttle_increment(struct esc *e, float inc)
 {
-    log_info("throttle up");
     e->throttle += inc;
 }
 
 void esc_throttle_decrement(struct esc *e, float dec)
 {
-    log_info("throttle down");
     e->throttle -= dec;
 }
