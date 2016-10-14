@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 
+#include <linux/i2c-dev.h>
 
 #include "util.h"
 
@@ -12,15 +15,25 @@
 /* ERROR MESSAGES */
 #define I2C_INIT_FAILED "failed to initialize I2C!"
 
+/* DEFINES */
+#define I2C_BUF_MAX 1024
+
+
+/* STRUCTURES */
+struct i2c
+{
+    int fd;
+
+
+};
+
 
 /* FUNCTIONS */
-int i2c_setup(void);
-void i2c_teardown(void);
-void i2c_set_slave(char slave_addr);
-int i2c_read_bytes(char reg_addr, char *data, size_t data_length);
-int i2c_read_byte(char reg_addr, char *data);
-int i2c_write_bytes(char reg_addr, char *data, size_t data_length);
-int i2c_write_byte(char reg_addr, char byte);
-int i2c_write_raw_byte(uint8_t byte);
+int i2c_setup(struct i2c *conn);
+int i2c_set_slave(struct i2c *conn, char slave_addr);
+int i2c_read_bytes(struct i2c *conn, char reg_addr, char *data, size_t length);
+int i2c_read_byte(struct i2c *conn, char reg_addr, char *data);
+int i2c_write_byte(struct i2c *conn, char reg_addr, char byte);
+int i2c_write_bytes(struct i2c *conn, char reg_addr, char *data, size_t length);
 
 #endif
