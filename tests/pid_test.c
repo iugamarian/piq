@@ -3,7 +3,7 @@
 #include "controller/pid.h"
 
 
-/* PROTOTYPES */
+/* TESTS */
 int test_pid_setup_and_destroy(void);
 int test_pid_calculate(void);
 void test_suite(void);
