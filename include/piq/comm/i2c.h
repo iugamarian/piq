@@ -9,7 +9,7 @@
 
 #include <linux/i2c-dev.h>
 
-#include "util.h"
+#include "piq/util.h"
 
 
 /* ERROR MESSAGES */

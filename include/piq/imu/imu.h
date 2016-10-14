@@ -3,8 +3,8 @@
 
 
 #include <stdint.h>
-#include "imu/mpu6050.h"
-#include "imu/mpu9250.h"
+#include "piq/imu/mpu6050.h"
+#include "piq/imu/mpu9250.h"
 
 
 /* STRUCTURES */

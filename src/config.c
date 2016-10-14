@@ -1,4 +1,4 @@
-#include "config.h"
+#include "piq/config.h"
 
 
 struct config *config_new(void)

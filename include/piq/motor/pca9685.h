@@ -1,11 +1,11 @@
 #ifndef __PCA9685_H__
 #define __PCA9685_H__
 
-#include "unistd.h"
-#include "math.h"
+#include <math.h>
+#include <unistd.h>
 
-#include "util.h"
-#include "comm/i2c.h"
+#include "piq/util.h"
+#include "piq/comm/i2c.h"
 
 
 /* REGISTERS */

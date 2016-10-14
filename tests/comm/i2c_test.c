@@ -1,5 +1,5 @@
 #include "munit.h"
-#include "comm/i2c.h"
+#include "piq/comm/i2c.h"
 
 
 /* TESTS */
@@ -25,7 +25,7 @@ int test_i2c_read_byte(void)
     i2c_setup(&conn);
     i2c_set_slave(&conn, 0x68);
     i2c_read_byte(&conn, 0x75, &data);
-   
+
     printf("got: 0x%02X\n", (int) data);
 
     return 0;

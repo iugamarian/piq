@@ -1,6 +1,6 @@
 #include "munit.h"
-#include "motor/esc.h"
-#include "controller/pid.h"
+#include "piq/motor/esc.h"
+#include "piq/controller/pid.h"
 
 
 /* TESTS */

@@ -1,5 +1,5 @@
 #include "munit.h"
-#include "imu/imu.h"
+#include "piq/imu/imu.h"
 
 
 /* PROTOTYPES */

@@ -1,4 +1,4 @@
-#include "piq.h"
+#include "piq/piq.h"
 
 
 /* struct piq *piq_setup(void) */

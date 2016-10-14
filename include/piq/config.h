@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <math.h>
 
-#include "util.h"
+#include "piq/util.h"
 
 
 /* STRUCTURES */

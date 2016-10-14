@@ -9,9 +9,9 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "config.h"
-#include "imu/imu.h"
-#include "comm/i2c.h"
+#include "piq/config.h"
+#include "piq/imu/imu.h"
+#include "piq/comm/i2c.h"
 
 
 /* GENERAL */

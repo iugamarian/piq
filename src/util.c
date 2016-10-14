@@ -1,4 +1,4 @@
-#include "util.h"
+#include "piq/util.h"
 
 
 struct terminal_settings terminal_settings_new(void)

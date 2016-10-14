@@ -5,14 +5,14 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-#include "util.h"
-#include "imu/imu.h"
-#include "imu/mpu6050.h"
-#include "motor/esc.h"
-#include "motor/pca9685.h"
-#include "comm/comm.h"
-#include "comm/i2c.h"
-#include "config.h"
+#include "piq/util.h"
+#include "piq/config.h"
+#include "piq/imu/imu.h"
+#include "piq/imu/mpu6050.h"
+#include "piq/motor/esc.h"
+#include "piq/motor/pca9685.h"
+#include "piq/comm/comm.h"
+#include "piq/comm/i2c.h"
 
 
 /* STATES */

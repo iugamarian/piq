@@ -1,4 +1,4 @@
-#include "motor/esc.h"
+#include "piq/motor/esc.h"
 
 
 struct esc *esc_setup(struct config *c)

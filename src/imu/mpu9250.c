@@ -1,4 +1,4 @@
-#include "imu/mpu9250.h"
+#include "piq/imu/mpu9250.h"
 
 
 void mpu9250_setup(struct mpu9250_data *data)

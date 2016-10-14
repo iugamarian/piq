@@ -1,4 +1,4 @@
-#include "imu/mpu6050.h"
+#include "piq/imu/mpu6050.h"
 
 
 int8_t mpu6050_setup(struct mpu6050_data *data)

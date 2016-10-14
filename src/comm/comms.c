@@ -1,4 +1,4 @@
-#include "comm/comm.h"
+#include "piq/comm/comm.h"
 
 
 static int tcp_client_setup(struct tcp_client *c)

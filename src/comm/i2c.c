@@ -1,4 +1,4 @@
-#include "comm/i2c.h"
+#include "piq/comm/i2c.h"
 
 
 int i2c_setup(struct i2c *conn)

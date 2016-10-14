@@ -1,4 +1,4 @@
-#include "imu/imu.h"
+#include "piq/imu/imu.h"
 
 
 void imu_setup(struct imu *i)

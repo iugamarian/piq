@@ -3,11 +3,11 @@
 
 #include <stdlib.h>
 
-#include "piq.h"
-#include "config.h"
-#include "imu/imu.h"
-#include "motor/pca9685.h"
-#include "controller/pid.h"
+#include "piq/piq.h"
+#include "piq/config.h"
+#include "piq/imu/imu.h"
+#include "piq/motor/pca9685.h"
+#include "piq/controller/pid.h"
 
 
 /* STRUCTURES */

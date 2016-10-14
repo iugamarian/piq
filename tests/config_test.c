@@ -1,5 +1,5 @@
 #include "munit.h"
-#include "config.h"
+#include "piq/config.h"
 
 #define TEST_CONFIG "tests/data/piq.config"
 

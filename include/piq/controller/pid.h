@@ -5,7 +5,7 @@
 #include <math.h>
 #include <sys/timeb.h>
 
-#include "config.h"
+#include "piq/config.h"
 
 
 /* STRUCTURES */
