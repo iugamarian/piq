@@ -11,7 +11,7 @@
 #include "piq/imu/mpu6050.h"
 #include "piq/motor/esc.h"
 #include "piq/motor/pca9685.h"
-#include "piq/comm/comm.h"
+#include "piq/comm/tcp.h"
 #include "piq/comm/i2c.h"
 
 
