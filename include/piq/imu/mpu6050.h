@@ -173,7 +173,7 @@ struct mpu6050_accelerometer
     float roll;
 };
 
-struct mpu6050_data
+struct mpu6050
 {
     struct mpu6050_gyroscope gyro;
     struct mpu6050_accelerometer accel;
@@ -188,27 +188,29 @@ struct mpu6050_data
     clock_t last_updated;
     int16_t sample_rate;
     int8_t dplf_config;
+
+    struct i2c *conn;
 };
 
 
 
 /* FUNCTIONS */
-int8_t mpu6050_setup(struct mpu6050_data *data);
-int8_t mpu6050_ping(void);
-int8_t mpu6050_data(struct mpu6050_data *data);
-int8_t mpu6050_calibrate(struct mpu6050_data *data);
-void mpu6050_data_print(struct mpu6050_data *data);
-int8_t mpu6050_get_dplf_config(void);
-int8_t mpu6050_set_dplf_config(int8_t setting);
-int16_t mpu6050_get_sample_rate(void);
-int8_t mpu6050_get_sample_rate_div(void);
-int8_t mpu6050_set_sample_rate_div(int8_t setting);
-int8_t mpu6050_get_gyro_range(void);
-int8_t mpu6050_set_gyro_range(int8_t setting);
-int8_t mpu6050_get_accel_range(void);
-int8_t mpu6050_set_accel_range(int8_t setting);
-void mpu6050_info(struct mpu6050_data *data);
-int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data);
-int8_t mpu6050_record(char *output_path, int nb_samples);
+int8_t mpu6050_setup(struct mpu6050 *data);
+int8_t mpu6050_ping(struct mpu6050 *data);
+int8_t mpu6050_data(struct mpu6050 *data);
+int8_t mpu6050_calibrate(struct mpu6050 *data);
+void mpu6050_data_print(struct mpu6050 *data);
+/* int8_t mpu6050_set_dplf_config(int8_t setting); */
+/* int8_t mpu6050_get_dplf_config(void); */
+/* int16_t mpu6050_get_sample_rate(void); */
+/* int8_t mpu6050_get_sample_rate_div(void); */
+/* int8_t mpu6050_set_sample_rate_div(int8_t setting); */
+/* int8_t mpu6050_get_gyro_range(void); */
+/* int8_t mpu6050_set_gyro_range(int8_t setting); */
+/* int8_t mpu6050_get_accel_range(void); */
+/* int8_t mpu6050_set_accel_range(int8_t setting); */
+/* void mpu6050_info(struct mpu6050_data *data); */
+/* int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data); */
+/* int8_t mpu6050_record(char *output_path, int nb_samples); */
 
 #endif

@@ -1,39 +1,39 @@
 #include "piq/imu/mpu6050.h"
 
 
-int8_t mpu6050_setup(struct mpu6050_data *data)
+int8_t mpu6050_setup(struct mpu6050 *data)
 {
-    /* int8_t retval; */
-    /*  */
-    /* #<{(| setup |)}># */
-    /* log_info("initializing mpu6050"); */
-    /* #<{(| i2c_set_slave(MPU6050_ADDRESS); |)}># */
-    /*  */
-    /* #<{(| set intial values |)}># */
-    /* data->gyro.offset_x = 0.0f; */
-    /* data->gyro.offset_y = 0.0f; */
-    /* data->gyro.offset_z = 0.0f; */
-    /* data->gyro.pitch = 0.0f; */
-    /* data->gyro.roll = 0.0f; */
-    /*  */
-    /* data->accel.offset_x = 0.0f; */
-    /* data->accel.offset_y = 0.0f; */
-    /* data->accel.offset_z = 0.0f; */
-    /* data->accel.pitch = 0.0f; */
-    /* data->accel.roll = 0.0f; */
-    /*  */
-    /* data->pitch_offset = 0.0f; */
-    /* data->roll_offset = 0.0f; */
-    /*  */
-    /* data->temperature = 0.0f; */
-    /* data->pitch = 0.0f; */
-    /* data->roll = 0.0f; */
-    /*  */
-    /* data->last_updated = clock(); */
-    /* data->sample_rate = -1.0; */
-    /* data->dplf_config = 0; */
-    /*  */
-    /* #<{(| set dplf |)}># */
+    int8_t retval;
+
+    /* setup */
+    log_info("initializing mpu6050");
+    i2c_set_slave(data->conn, MPU6050_ADDRESS);
+
+    /* set intial values */
+    data->gyro.offset_x = 0.0f;
+    data->gyro.offset_y = 0.0f;
+    data->gyro.offset_z = 0.0f;
+    data->gyro.pitch = 0.0f;
+    data->gyro.roll = 0.0f;
+
+    data->accel.offset_x = 0.0f;
+    data->accel.offset_y = 0.0f;
+    data->accel.offset_z = 0.0f;
+    data->accel.pitch = 0.0f;
+    data->accel.roll = 0.0f;
+
+    data->pitch_offset = 0.0f;
+    data->roll_offset = 0.0f;
+
+    data->temperature = 0.0f;
+    data->pitch = 0.0f;
+    data->roll = 0.0f;
+
+    data->last_updated = clock();
+    data->sample_rate = -1.0;
+    data->dplf_config = 0;
+
+    /* set dplf */
     /* mpu6050_set_dplf_config(6); */
     /* retval = mpu6050_get_dplf_config(); */
     /* if (retval > 7 || retval < 0) { */
@@ -42,11 +42,11 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
     /*     data->dplf_config = retval; */
     /*     log_info("dplf config: %d", data->dplf_config); */
     /* } */
-    /*  */
-    /* #<{(| set power management register |)}># */
-    /* i2c_write_byte(MPU6050_RA_PWR_MGMT_1, 0x00); */
-    /*  */
-    /* #<{(| get gyro range |)}># */
+
+    /* set power management register */
+    i2c_write_byte(data->conn, MPU6050_RA_PWR_MGMT_1, 0x00);
+
+    /* get gyro range */
     /* mpu6050_set_gyro_range(0); */
     /* retval = mpu6050_get_gyro_range(); */
     /* if (retval == 0) { */
@@ -75,119 +75,119 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
     /* } else { */
     /*     return -3; */
     /* } */
-    /*  */
-    /* #<{(| get sample rate |)}># */
+
+    /* get sample rate */
     /* data->sample_rate = mpu6050_get_sample_rate(); */
-    /*  */
-    /* #<{(| calibrate mpu6050 |)}># */
-    /* #<{(| mpu6050_calibrate(data); |)}># */
+
+    /* calibrate mpu6050 */
+    mpu6050_calibrate(data);
 
     return 0;
 }
 
-/* int8_t mpu6050_ping(void) */
-/* { */
-/*     char data[1]; */
-/*  */
-/*     #<{(| print mpu6050 address |)}># */
-/*     data[0] = 0x00; */
-/*     i2c_set_slave(MPU6050_ADDRESS); */
-/*     i2c_read_bytes(MPU6050_RA_WHO_AM_I, data, 1); */
-/*     printf("MPU6050 ADDRESS: 0x%02X\n", data[0]); */
-/*  */
-/*     return 0; */
-/* } */
-/*  */
-/* static void accelerometer_calc_angle(struct mpu6050_data *data) */
-/* { */
-/*     float x; */
-/*     float y; */
-/*     float z; */
-/*  */
-/*     #<{(| setup |)}># */
-/*     x = data->accel.x; */
-/*     y = data->accel.y; */
-/*     z = data->accel.z; */
-/*  */
-/*     #<{(| calculate pitch and roll |)}># */
-/*     data->accel.pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI; */
-/*     data->accel.roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI; */
-/* } */
-/*  */
-/* static void gyroscope_calc_angle(struct mpu6050_data *data, float dt) */
-/* { */
-/*     data->gyro.roll = (data->gyro.x * dt) + data->roll; */
-/*     data->gyro.pitch = (data->gyro.y * dt) + data->pitch; */
-/* } */
-/*  */
-/* int8_t mpu6050_data(struct mpu6050_data *data) */
-/* { */
-/*     char raw_data[14]; */
-/*     int8_t raw_temp; */
-/*     float dt; */
-/*     clock_t time_now; */
-/*     int retval; */
-/*  */
-/*     #<{(| read sensor data |)}># */
-/*     memset(raw_data, 0, 14); */
-/*     i2c_set_slave(MPU6050_ADDRESS); */
-/*     retval = i2c_read_bytes(MPU6050_RA_ACCEL_XOUT_H, raw_data, 14); */
-/*     if (retval != 0) { */
-/*         return -1; */
-/*     } */
-/*  */
-/*     #<{(| accelerometer |)}># */
-/*     data->accel.raw_x = (raw_data[0] << 8) | (raw_data[1]); */
-/*     data->accel.raw_y = (raw_data[2] << 8) | (raw_data[3]); */
-/*     data->accel.raw_z = (raw_data[4] << 8) | (raw_data[5]); */
-/*  */
-/*     data->accel.raw_x -= data->accel.offset_x; */
-/*     data->accel.raw_y -= data->accel.offset_y; */
-/*     data->accel.raw_z -= data->accel.offset_z; */
-/*  */
-/*     data->accel.x = data->accel.raw_x / data->accel.sensitivity; */
-/*     data->accel.y = data->accel.raw_y / data->accel.sensitivity; */
-/*     data->accel.z = data->accel.raw_z / data->accel.sensitivity; */
-/*  */
-/*     #<{(| temperature |)}># */
-/*     raw_temp = (raw_data[6] << 8) | (raw_data[7]); */
-/*     data->temperature = raw_temp / 340.0 + 36.53; */
-/*  */
-/*     #<{(| gyroscope |)}># */
-/*     data->gyro.raw_x = (raw_data[8] << 8) | (raw_data[9]); */
-/*     data->gyro.raw_y = (raw_data[10] << 8) | (raw_data[11]); */
-/*     data->gyro.raw_z = (raw_data[12] << 8) | (raw_data[13]); */
-/*  */
-/*     data->gyro.raw_x -= data->gyro.offset_x; */
-/*     data->gyro.raw_y -= data->gyro.offset_y; */
-/*     data->gyro.raw_z -= data->gyro.offset_z; */
-/*  */
-/*     data->gyro.x = data->gyro.raw_x / data->gyro.sensitivity; */
-/*     data->gyro.y = data->gyro.raw_y / data->gyro.sensitivity; */
-/*     data->gyro.z = data->gyro.raw_z / data->gyro.sensitivity; */
-/*  */
-/*  */
-/*     #<{(| calculate dt |)}># */
-/*     time_now = clock(); */
-/*     dt = ((double) time_now - data->last_updated) / CLOCKS_PER_SEC; */
-/*  */
-/*     #<{(| complimentary filter |)}># */
-/*     accelerometer_calc_angle(data); */
-/*     data->pitch = (0.98 * data->gyro.pitch) + (0.02 * data->accel.pitch); */
-/*     data->roll = (0.98 * data->gyro.roll) + (0.02 * data->accel.roll); */
-/*     gyroscope_calc_angle(data, dt); */
-/*  */
-/*     #<{(| offset pitch and roll |)}># */
-/*     data->pitch += data->pitch_offset; */
-/*     data->roll += data->roll_offset; */
-/*  */
-/*     #<{(| set last_updated |)}># */
-/*     data->last_updated = clock(); */
-/*  */
-/*     return 0; */
-/* } */
-/*  */
-/* int8_t mpu6050_calibrate(struct mpu6050_data *data) */
+int8_t mpu6050_ping(struct mpu6050 *data)
+{
+    char buf[1];
+
+    /* print mpu6050 address */
+    buf[0] = 0x00;
+    i2c_set_slave(data->conn, MPU6050_ADDRESS);
+    i2c_read_bytes(data->conn, MPU6050_RA_WHO_AM_I, buf, 1);
+    printf("MPU6050 ADDRESS: 0x%02X\n", buf[0]);
+
+    return 0;
+}
+
+static void accelerometer_calc_angle(struct mpu6050 *data)
+{
+    float x;
+    float y;
+    float z;
+
+    /* setup */
+    x = data->accel.x;
+    y = data->accel.y;
+    z = data->accel.z;
+
+    /* calculate pitch and roll */
+    data->accel.pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
+    data->accel.roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
+}
+
+static void gyroscope_calc_angle(struct mpu6050 *data, float dt)
+{
+    data->gyro.roll = (data->gyro.x * dt) + data->roll;
+    data->gyro.pitch = (data->gyro.y * dt) + data->pitch;
+}
+
+int8_t mpu6050_data(struct mpu6050 *data)
+{
+    char raw_data[14];
+    int8_t raw_temp;
+    float dt;
+    clock_t time_now;
+    int retval;
+
+    /* read sensor data */
+    memset(raw_data, 0, 14);
+    i2c_set_slave(data->conn, MPU6050_ADDRESS);
+    retval = i2c_read_bytes(data->conn, MPU6050_RA_ACCEL_XOUT_H, raw_data, 14);
+    if (retval != 0) {
+        return -1;
+    }
+
+    /* accelerometer */
+    data->accel.raw_x = (raw_data[0] << 8) | (raw_data[1]);
+    data->accel.raw_y = (raw_data[2] << 8) | (raw_data[3]);
+    data->accel.raw_z = (raw_data[4] << 8) | (raw_data[5]);
+
+    data->accel.raw_x -= data->accel.offset_x;
+    data->accel.raw_y -= data->accel.offset_y;
+    data->accel.raw_z -= data->accel.offset_z;
+
+    data->accel.x = data->accel.raw_x / data->accel.sensitivity;
+    data->accel.y = data->accel.raw_y / data->accel.sensitivity;
+    data->accel.z = data->accel.raw_z / data->accel.sensitivity;
+
+    /* temperature */
+    raw_temp = (raw_data[6] << 8) | (raw_data[7]);
+    data->temperature = raw_temp / 340.0 + 36.53;
+
+    /* gyroscope */
+    data->gyro.raw_x = (raw_data[8] << 8) | (raw_data[9]);
+    data->gyro.raw_y = (raw_data[10] << 8) | (raw_data[11]);
+    data->gyro.raw_z = (raw_data[12] << 8) | (raw_data[13]);
+
+    data->gyro.raw_x -= data->gyro.offset_x;
+    data->gyro.raw_y -= data->gyro.offset_y;
+    data->gyro.raw_z -= data->gyro.offset_z;
+
+    data->gyro.x = data->gyro.raw_x / data->gyro.sensitivity;
+    data->gyro.y = data->gyro.raw_y / data->gyro.sensitivity;
+    data->gyro.z = data->gyro.raw_z / data->gyro.sensitivity;
+
+
+    /* calculate dt */
+    time_now = clock();
+    dt = ((double) time_now - data->last_updated) / CLOCKS_PER_SEC;
+
+    /* complimentary filter */
+    accelerometer_calc_angle(data);
+    data->pitch = (0.98 * data->gyro.pitch) + (0.02 * data->accel.pitch);
+    data->roll = (0.98 * data->gyro.roll) + (0.02 * data->accel.roll);
+    gyroscope_calc_angle(data, dt);
+
+    /* offset pitch and roll */
+    data->pitch += data->pitch_offset;
+    data->roll += data->roll_offset;
+
+    /* set last_updated */
+    data->last_updated = clock();
+
+    return 0;
+}
+
+/* int8_t mpu6050_calibrate(struct mpu6050 *data) */
 /* { */
 /*     int16_t i; */
 /*  */
@@ -220,49 +220,30 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
 /*  */
 /*     return 0; */
 /* } */
-/*  */
-/* void mpu6050_data_print(struct mpu6050_data *data) */
-/* { */
-/*     printf("gyro_x: %f\n", data->gyro.x); */
-/*     printf("gyro_y: %f\n", data->gyro.y); */
-/*     printf("gyro_z: %f\n", data->gyro.z); */
-/*  */
-/*     printf("accel x: %f\n", data->accel.x); */
-/*     printf("accel y: %f\n", data->accel.y); */
-/*     printf("accel z: %f\n", data->accel.z); */
-/*  */
-/*     printf("\n"); */
-/*     printf("accel pitch: %f\n", data->accel.pitch); */
-/*     printf("accel roll: %f\n", data->accel.roll); */
-/*     printf("\n"); */
-/*     printf("gyro pitch: %f\n", data->gyro.pitch); */
-/*     printf("gyro roll: %f\n", data->gyro.roll); */
-/*     printf("\n"); */
-/*  */
-/*     printf("temp: %f\n", data->temperature); */
-/*     printf("\n"); */
-/*     printf("\n"); */
-/* } */
-/*  */
-/* int8_t mpu6050_get_dplf_config(void) */
-/* { */
-/*     char data[1]; */
-/*     int retval; */
-/*  */
-/*     #<{(| get dplf config |)}># */
-/*     data[0] = 0x00; */
-/*     i2c_set_slave(MPU6050_ADDRESS); */
-/*     retval = i2c_read_bytes(MPU6050_RA_CONFIG, data, 1); */
-/*     if (retval != 0) { */
-/*         return -1; */
-/*     } */
-/*  */
-/*     log_info("GET DPLF: %d", data[0]); */
-/*     data[0] = data[0] & 0b00000111; */
-/*  */
-/*     return data[0]; */
-/* } */
-/*  */
+
+void mpu6050_data_print(struct mpu6050 *data)
+{
+    printf("gyro_x: %f\n", data->gyro.x);
+    printf("gyro_y: %f\n", data->gyro.y);
+    printf("gyro_z: %f\n", data->gyro.z);
+
+    printf("accel x: %f\n", data->accel.x);
+    printf("accel y: %f\n", data->accel.y);
+    printf("accel z: %f\n", data->accel.z);
+
+    printf("\n");
+    printf("accel pitch: %f\n", data->accel.pitch);
+    printf("accel roll: %f\n", data->accel.roll);
+    printf("\n");
+    printf("gyro pitch: %f\n", data->gyro.pitch);
+    printf("gyro roll: %f\n", data->gyro.roll);
+    printf("\n");
+
+    printf("temp: %f\n", data->temperature);
+    printf("\n");
+    printf("\n");
+}
+
 /* int8_t mpu6050_set_dplf_config(int8_t setting) */
 /* { */
 /*     int retval; */
@@ -309,6 +290,25 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
 /*     return 0; */
 /* } */
 /*  */
+/* int8_t mpu6050_get_dplf_config(void) */
+/* { */
+/*     char data[1]; */
+/*     int retval; */
+/*  */
+/*     #<{(| get dplf config |)}># */
+/*     data[0] = 0x00; */
+/*     i2c_set_slave(MPU6050_ADDRESS); */
+/*     retval = i2c_read_bytes(MPU6050_RA_CONFIG, data, 1); */
+/*     if (retval != 0) { */
+/*         return -1; */
+/*     } */
+/*  */
+/*     log_info("GOT DPLF: %d", data[0]); */
+/*     data[0] = data[0] & 0b00000111; */
+/*  */
+/*     return data[0]; */
+/* } */
+
 /* int16_t mpu6050_get_sample_rate(void) */
 /* { */
 /*     uint8_t smplrt_div; */
@@ -450,7 +450,7 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
 /*     return 0; */
 /* } */
 /*  */
-/* void mpu6050_info(struct mpu6050_data *data) */
+/* void mpu6050_info(struct mpu6050 *data) */
 /* { */
 /*     printf("gyro sensitivity: %f\n", data->gyro.sensitivity); */
 /*     printf("gyro offset_x: %f\n", data->gyro.offset_x); */
@@ -466,7 +466,7 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
 /*     printf("\n"); */
 /* } */
 /*  */
-/* int8_t mpu6050_record_data(FILE *output_file, struct mpu6050_data *data) */
+/* int8_t mpu6050_record_data(FILE *output_file, struct mpu6050 *data) */
 /* { */
 /*     fprintf(output_file, "%f,", data->gyro.x); */
 /*     fprintf(output_file, "%f,", data->gyro.y); */
@@ -491,7 +491,7 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
 /*     int i; */
 /*     int8_t retval; */
 /*     FILE *output_file; */
-/*     struct mpu6050_data data; */
+/*     struct mpu6050 data; */
 /*  */
 /*     #<{(| setup |)}># */
 /*     mpu6050_setup(&data); */
@@ -502,7 +502,7 @@ int8_t mpu6050_setup(struct mpu6050_data *data)
 /*  */
 /*     for (i = 0; i < nb_samples; i++) { */
 /*         #<{(| get data |)}># */
-/*         retval = mpu6050_data(&data); */
+/*         retval = mpu6050(&data); */
 /*         if (retval == -1) { */
 /*             log_err("failed to obtain data from MPU6050!"); */
 /*             return -1; */
