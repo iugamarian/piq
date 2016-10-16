@@ -2,7 +2,7 @@
 #include "piq/imu/imu.h"
 
 
-/* PROTOTYPES */
+/* TESTS */
 int test_imu_setup(void);
 void test_suite(void);
 

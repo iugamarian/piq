@@ -3,11 +3,7 @@ include $(PWD)/config.mk
 SRCS = $(wildcard *.c)
 TESTS = $(SRCS:.c=)
 
-default: subdirs $(TESTS)
-
-subdirs:
-	make -s -C comm
-	make -s -C imu
+default: $(TESTS) 
 
 %: %.c
 	$(MAKE_TEST)

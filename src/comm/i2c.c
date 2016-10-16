@@ -53,7 +53,7 @@ int i2c_read_bytes(struct i2c *conn, char reg_addr, char *data, size_t length)
         return -1;
     }
 
-    if (read(conn->fd, data, length) != 1) {
+    if (read(conn->fd, data, length) != length) {
         return -2;
     }
 
