@@ -6,7 +6,6 @@ int8_t mpu6050_setup(struct mpu6050 *sensor, struct i2c *conn)
     int8_t retval;
 
     /* setup */
-    log_info("initializing mpu6050");
     sensor->conn = conn;
     i2c_set_slave(sensor->conn, MPU6050_ADDRESS);
 

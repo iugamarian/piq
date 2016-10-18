@@ -1,35 +1,154 @@
 #include "piq/imu/mpu9250.h"
 
 
-void mpu9250_setup(struct mpu9250_data *data)
+void mpu9250_setup(struct mpu9250 *sensor, struct i2c *conn)
 {
-    data->gyro.offset_x = 0.0f;
-    data->gyro.offset_y = 0.0f;
-    data->gyro.offset_z = 0.0f;
-    data->gyro.pitch = 0.0f;
-    data->gyro.roll = 0.0f;
+    /* setup */
+    sensor->conn = conn;
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
 
-    data->accel.offset_x = 0.0f;
-    data->accel.offset_y = 0.0f;
-    data->accel.offset_z = 0.0f;
-    data->accel.pitch = 0.0f;
-    data->accel.roll = 0.0f;
+    /* set initial values */
+    sensor->gyro.offset_x = 0.0f;
+    sensor->gyro.offset_y = 0.0f;
+    sensor->gyro.offset_z = 0.0f;
+    sensor->gyro.pitch = 0.0f;
+    sensor->gyro.roll = 0.0f;
 
-    data->pitch = 0.0f;
-    data->roll = 0.0f;
+    sensor->accel.offset_x = 0.0f;
+    sensor->accel.offset_y = 0.0f;
+    sensor->accel.offset_z = 0.0f;
+    sensor->accel.pitch = 0.0f;
+    sensor->accel.roll = 0.0f;
 
-    data->sample_rate = -1.0;
+    sensor->pitch = 0.0f;
+    sensor->roll = 0.0f;
+
+    sensor->sample_rate = -1.0;
 }
 
-int8_t mpu9250_ping(void)
+int8_t mpu9250_ping(struct mpu9250 *sensor)
 {
-    char data[1];
+    char data;
 
     /* print mpu9250 address */
-    data[0] = 0x00;
-    /* i2c_set_slave(MPU9250_ADDRESS); */
-    /* i2c_read_bytes(MPU9250_WHO_AM_I, data, 1); */
-    printf("MPU9250 ADDRESS: 0x%02X\n", data[0]);
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
+    i2c_read_byte(sensor->conn, MPU9250_WHO_AM_I, &data);
+    printf("MPU9250 ADDRESS: 0x%02X\n", data);
 
-    return data[0];
+    return data;
+}
+
+int8_t mpu9250_set_gyro_scale(struct mpu9250 *sensor, int8_t scale)
+{
+    char data;
+    uint8_t retval;
+
+    /* pre-check */
+    if (scale > 3 || scale < 0) {
+        return -2;
+    }
+
+    /* set gyro scale */
+    data = scale << 3;
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
+    retval = i2c_write_byte(sensor->conn, MPU9250_GYRO_CONFIG, data);
+    if (retval != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int8_t mpu9250_get_gyro_scale(struct mpu9250 *sensor)
+{
+    char data;
+    uint8_t retval;
+
+    /* get gyro scale */
+    data = 0x00;
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
+    retval = i2c_read_byte(sensor->conn, MPU9250_GYRO_CONFIG, &data);
+    if (retval != 0) {
+        return -1;
+    }
+
+    /* get gyro scale bytes */
+    data = (data >> 3) & 0b00000011;
+
+    return data;
+}
+
+int8_t mpu9250_set_accel_scale(struct mpu9250 *sensor, int8_t scale)
+{
+    char data;
+    uint8_t retval;
+
+    /* pre-check */
+    if (scale > 3 || scale < 0) {
+        return -2;
+    }
+
+    /* set accel scale */
+    data = scale << 3;
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
+    retval = i2c_write_byte(sensor->conn, MPU9250_ACCEL_CONFIG, data);
+    if (retval != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int8_t mpu9250_get_accel_scale(struct mpu9250 *sensor)
+{
+    char data;
+    uint8_t retval;
+
+    /* get accel scale */
+    data = 0x00;
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
+    retval = i2c_read_byte(sensor->conn, MPU9250_ACCEL_CONFIG, &data);
+    if (retval != 0) {
+        return -1;
+    }
+
+    /* get accel scale bytes */
+    data = (data >> 3) & 0b00000011;
+
+    return data;
+}
+
+int8_t mpu9250_set_accel_fchoice(struct mpu9250 *sensor, int8_t fchoice)
+{
+    char data;
+    uint8_t retval;
+
+    /* set accel scale */
+    data = fchoice << 3;
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
+    retval = i2c_write_byte(sensor->conn, MPU9250_ACCEL_CONFIG2, data);
+    if (retval != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int8_t mpu9250_get_accel_fchoice(struct mpu9250 *sensor)
+{
+    char data;
+    uint8_t retval;
+
+    /* get accel scale */
+    data = 0x00;
+    i2c_set_slave(sensor->conn, MPU9250_ADDRESS);
+    retval = i2c_read_byte(sensor->conn, MPU9250_ACCEL_CONFIG2, &data);
+    if (retval != 0) {
+        return -1;
+    }
+
+    /* get accel scale bytes */
+    data = (data >> 3) & 0b00000001;
+
+    return data;
 }

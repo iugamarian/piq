@@ -173,7 +173,7 @@ struct mpu9250_magnetometer
     float heading;
 };
 
-struct mpu9250_data
+struct mpu9250
 {
     struct mpu9250_gyroscope gyro;
     struct mpu9250_accelerometer accel;
@@ -188,11 +188,19 @@ struct mpu9250_data
 
     clock_t last_updated;
     float sample_rate;
+
+    struct i2c *conn;
 };
 
 
 /* FUNCTIONS */
-void mpu9250_setup(struct mpu9250_data *data);
-int8_t mpu9250_ping(void);
+void mpu9250_setup(struct mpu9250 *sensor, struct i2c *conn);
+int8_t mpu9250_ping(struct mpu9250 *sensor);
+int8_t mpu9250_set_gyro_scale(struct mpu9250 *sensor, int8_t scale);
+int8_t mpu9250_get_gyro_scale(struct mpu9250 *sensor);
+int8_t mpu9250_set_accel_scale(struct mpu9250 *sensor, int8_t scale);
+int8_t mpu9250_get_accel_scale(struct mpu9250 *sensor);
+int8_t mpu9250_set_accel_fchoice(struct mpu9250 *sensor, int8_t fchoice);
+int8_t mpu9250_get_accel_fchoice(struct mpu9250 *sensor);
 
 #endif

@@ -4,8 +4,8 @@ make
 
 # valgrind ./bin/config_test
 # valgrind ./bin/pid_test
-# valgrind ./bin/mpu9250_test
-./bin/mpu6050_test
+./bin/mpu9250_test
+# ./bin/mpu6050_test
 
 # ./bin/piq
 # python scripts/plot.py
