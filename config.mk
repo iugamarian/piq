@@ -1,24 +1,29 @@
 # GENERAL
-CC = gcc
-STANDARD = -std=gnu99
+CXX = g++
+# STANDARD = -std=gnu99
 
 
 # DIRS
-BIN_DIR = $(PWD)/bin
-OBJ_DIR = $(PWD)/obj
-LIB_DIR = $(PWD)/lib
+BUILD_PATH = $(PWD)/build
+BIN_DIR = $(BUILD_PATH)/bin
+OBJ_DIR = $(BUILD_PATH)/obj
+LIB_DIR = $(BUILD_PATH)/lib
 
 
 # INCLUDE AND LIBRARY PATHS
 INCLUDES = -I$(PWD)/include -I/usr/local/include/
-LIBS = -L/usr/local/lib -L/usr/lib -L$(LIB_DIR) -lpiq -lm -lpthread
+LIBS = -L/usr/local/lib \
+	   -L/usr/lib \
+	   -L$(LIB_DIR) \
+	   -lm \
+	   -lpthread
 
 
 # COMPILER FLAGS
 DEBUG_FLAGS = -g -gdwarf-2
-WARN_FLAGS = -Wall -Wstrict-prototypes
+WARN_FLAGS = -Wall
 
-CFLAGS = $(DEBUG_FLAGS) \
+CXXFLAGS = $(DEBUG_FLAGS) \
 			$(WARN_FLAGS) \
 			$(STANDARD) \
 			$(INCLUDES)
@@ -26,13 +31,13 @@ CFLAGS = $(DEBUG_FLAGS) \
 
 # COMMANDS
 MAKE_EXE = \
-	echo "CC [$@]"; \
-	$(CC) $(CFLAGS) -c $@.c -o $(OBJ_DIR)/$@.o; \
-	$(CC) $(OBJ_DIR)/$@.o -o $(BIN_DIR)/$@ $(LIBS);
+	echo "CXX [$@]"; \
+	$(CXX) $(CXXFLAGS) -c $@.c -o $(OBJ_DIR)/$@.o; \
+	$(CXX) $(OBJ_DIR)/$@.o -o $(BIN_DIR)/$@ $(LIBS);
 
 MAKE_OBJ = \
-	@echo "CC [$<]"; \
-	$(CC) $(CFLAGS) -c $< -o $(addprefix $(OBJ_DIR)/, $@);
+	@echo "CXX [$<]"; \
+	$(CXX) $(CXXFLAGS) -c $< -o $(addprefix $(OBJ_DIR)/, $@);
 
 MAKE_STATIC_LIB = \
 	@echo "AR [$@]"; \
@@ -40,5 +45,5 @@ MAKE_STATIC_LIB = \
 
 MAKE_TEST = \
 	echo "TEST [$@]"; \
-	$(CC) $(CFLAGS) -c $@.c -o $(OBJ_DIR)/$@.o; \
-	$(CC) $(OBJ_DIR)/$@.o -o $(BIN_DIR)/$@ $(LIBS);
+	$(CXX) $(CFLAGS) -c $@.c -o $(OBJ_DIR)/$@.o; \
+	$(CXX) $(OBJ_DIR)/$@.o -o $(BIN_DIR)/$@ $(LIBS);

@@ -1,5 +1,4 @@
 include $(PWD)/config.mk
-
 SRCS = $(wildcard *.c)
 TESTS = $(SRCS:.c=)
 

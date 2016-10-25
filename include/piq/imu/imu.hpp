@@ -1,15 +1,18 @@
-#ifndef __IMU_H__
-#define __IMU_H__
+#ifndef __IMU_HPP__
+#define __IMU_HPP__
 
 
 #include <stdint.h>
-#include "piq/imu/mpu6050.h"
-#include "piq/imu/mpu9250.h"
+#include "piq/imu/mpu6050.hpp"
+#include "piq/imu/mpu9250.hpp"
 
 
-/* STRUCTURES */
-struct gyroscope
+namespace piq {
+namespace imu {
+
+class Gyroscope
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -28,8 +31,9 @@ struct gyroscope
     float roll;
 };
 
-struct accelerometer
+class Accelerometer
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -48,8 +52,9 @@ struct accelerometer
     float roll;
 };
 
-struct magnetometer
+class Magnetometer
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -67,10 +72,12 @@ struct magnetometer
     float heading;
 };
 
-struct imu
+class IMU
 {
-    struct gyroscope gyro;
-    struct accelerometer accel;
+public:
+    Gyroscope gyro;
+    Accelerometer accel;
+    Magnetometer mag;
 
     float temperature;
     float pitch;
@@ -81,10 +88,10 @@ struct imu
 
     clock_t last_updated;
     float sample_rate;
+
+    IMU(void);
 };
 
-
-/* FUNCTIONS */
-void imu_setup(struct imu *i);
-
+}  // eof imu
+}  // eof piq
 #endif

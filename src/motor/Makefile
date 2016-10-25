@@ -1,7 +1,6 @@
 include $(PWD)/config.mk
-SRCS = $(wildcard *.c)
-OBJS = $(SRCS:.c=.o)
-
+SRCS = $(wildcard *.cpp)
+OBJS = $(SRCS:.cpp=.o)
 
 default: $(OBJS)
 

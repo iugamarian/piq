@@ -1,7 +1,7 @@
-#ifndef __MPU9250_H__
-#define __MPU9250_H__
+#ifndef __MPU9250_HPP__
+#define __MPU9250_HPP__
 
-#include "piq/comm/i2c.h"
+#include "piq/comm/i2c.hpp"
 
 
 /* GENERAL */

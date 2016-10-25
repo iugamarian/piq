@@ -1,11 +1,9 @@
 include $(PWD)/config.mk
-FOLDER_NAME = src
+SRCS = $(filter-out piq.cpp, $(wildcard *.cpp))
+OBJS = $(SRCS:.cpp=.o)
 
-SRCS = $(filter-out piq.c, $(wildcard *.c))
-OBJS = $(SRCS:.c=.o)
-
-
-default: subdirs libpiq piq
+# default: subdirs libpiq piq
+default: subdirs
 
 subdirs:
 	make -s -C comm

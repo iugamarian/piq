@@ -5,21 +5,19 @@ default: rmdirs all done
 
 all: mkdirs
 	@make -s -C src
-	@make -s -C tests
 
 debug: mkdirs
 	make -C src
 	@make -C tests
 
 mkdirs: rmdirs
-	@mkdir bin
-	@mkdir obj
-	@mkdir lib
+	@mkdir -p build
+	@mkdir -p build/bin
+	@mkdir -p build/obj
+	@mkdir -p build/lib
 
 rmdirs:
-	@rm -rf bin
-	@rm -rf obj
-	@rm -rf lib
+	@rm -rf build
 
 clean: rmdirs
 	@echo "cleaning ..."

@@ -1,4 +1,4 @@
-#include "piq/imu/mpu9250.h"
+#include "piq/imu/mpu9250.hpp"
 
 
 void mpu9250_setup(struct mpu9250 *sensor, struct i2c *conn)

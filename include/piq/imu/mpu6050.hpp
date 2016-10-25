@@ -1,17 +1,9 @@
-#ifndef __MPU6050_H__
-#define __MPU6050_H__
+#ifndef __MPU6050_HPP__
+#define __MPU6050_HPP__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <float.h>
 #include <time.h>
-#include <unistd.h>
 
-#include "piq/config.h"
-#include "piq/imu/imu.h"
-#include "piq/comm/i2c.h"
+#include "piq/comm/i2c.hpp"
 
 
 /* GENERAL */
@@ -132,9 +124,12 @@
 #define MPU6050_RA_WHO_AM_I             0x75
 
 
-/* STRUCTURES */
-struct mpu6050_gyroscope
+namespace piq {
+namespace imu {
+
+class MPU6050Gyroscope
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -153,8 +148,9 @@ struct mpu6050_gyroscope
     float roll;
 };
 
-struct mpu6050_accelerometer
+class MPU6050Accelerometer
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -173,43 +169,47 @@ struct mpu6050_accelerometer
     float roll;
 };
 
-struct mpu6050
+class MPU6050
 {
-    struct mpu6050_gyroscope gyro;
-    struct mpu6050_accelerometer accel;
+public:
+    MPU6050Gyroscope gyro;
+    MPU6050Accelerometer accel;
+    comm::I2C i2c;
 
-    float roll;
-    float pitch;
     float temperature;
+    float pitch;
+    float roll;
 
     float pitch_offset;
     float roll_offset;
 
     clock_t last_updated;
-    int16_t sample_rate;
+    float sample_rate;
     int8_t dplf_config;
 
-    struct i2c *conn;
+    MPU6050(void);
+    int8_t configure(void);
+    int8_t ping(void);
+    void accelerometerCalcAngle(void);
+    void gyroscopeCalcAngle(float dt);
+    int8_t getData(void);
+    int8_t calibrate(void);
+    void print(void);
+    int8_t setDPLFConfig(int8_t setting);
+    int8_t getDPLFConfig(void);
+    int8_t setSampleRateDiv(int8_t setting);
+    int8_t getSampleRateDiv(void);
+    int16_t getSampleRate(void);
+    int8_t setGyroRange(int8_t setting);
+    int8_t getGyroRange(void);
+    int8_t setAccelRange(int8_t setting);
+    int8_t getAccelRange(void);
+    void info(void);
+    void recordHeader(FILE *output_file);
+    void recordData(FILE *output_file);
+    int8_t record(char *output_path, int nb_samples);
 };
 
-
-
-/* FUNCTIONS */
-int8_t mpu6050_setup(struct mpu6050 *sensor, struct i2c *conn);
-int8_t mpu6050_ping(struct mpu6050 *sensor);
-int8_t mpu6050_data(struct mpu6050 *sensor);
-int8_t mpu6050_calibrate(struct mpu6050 *sensor);
-void mpu6050_print(struct mpu6050 *sensor);
-int8_t mpu6050_set_dplf_config(struct mpu6050 *sensor, int8_t setting);
-int8_t mpu6050_get_dplf_config(struct mpu6050 *sensor);
-int8_t mpu6050_set_sample_rate_div(struct mpu6050 *sensor, int8_t setting);
-int8_t mpu6050_get_sample_rate_div(struct mpu6050 *sensor);
-int16_t mpu6050_get_sample_rate(struct mpu6050 *sensor);
-int8_t mpu6050_set_gyro_range(struct mpu6050 *sensor, int8_t setting);
-int8_t mpu6050_get_gyro_range(struct mpu6050 *sensor);
-int8_t mpu6050_set_accel_range(struct mpu6050 *sensor, int8_t setting);
-int8_t mpu6050_get_accel_range(struct mpu6050 *sensor);
-void mpu6050_info(struct mpu6050 *sensor);
-int8_t mpu6050_record(struct mpu6050 *sensor, char *output_path, int nb_samples);
-
+}  // eof imu
+}  // eof piq
 #endif
