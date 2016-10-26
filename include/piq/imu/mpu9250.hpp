@@ -112,10 +112,12 @@
 #define MPU9250_ZA_OFFSET_L 0x7E
 
 
+namespace piq {
+namespace imu {
 
-/* STRUCTURES */
-struct mpu9250_gyroscope
+class MPU9250Gyroscope
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -134,8 +136,9 @@ struct mpu9250_gyroscope
     float roll;
 };
 
-struct mpu9250_accelerometer
+class MPU9250Accelerometer
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -154,8 +157,9 @@ struct mpu9250_accelerometer
     float roll;
 };
 
-struct mpu9250_magnetometer
+class MPU9250Magnetometer
 {
+public:
     float sensitivity;
 
     int16_t raw_x;
@@ -173,11 +177,13 @@ struct mpu9250_magnetometer
     float heading;
 };
 
-struct mpu9250
+class MPU9250
 {
-    struct mpu9250_gyroscope gyro;
-    struct mpu9250_accelerometer accel;
-    struct mpu9250_magnetometer mag;
+public:
+    MPU9250Gyroscope gyro;
+    MPU9250Accelerometer accel;
+    MPU9250Magnetometer mag;
+    comm::I2C i2c;
 
     float temperature;
     float pitch;
@@ -189,18 +195,17 @@ struct mpu9250
     clock_t last_updated;
     float sample_rate;
 
-    struct i2c *conn;
+    MPU9250(void);
+    int8_t configure(void);
+    int8_t ping(void);
+    int8_t setGyroScale(int8_t scale);
+    int8_t getGyroScale(void);
+    int8_t setAccelScale(int8_t scale);
+    int8_t getAccelScale(void);
+    int8_t setAccelFchoice(int8_t fchoice);
+    int8_t getAccelFchoice(void);
 };
 
-
-/* FUNCTIONS */
-void mpu9250_setup(struct mpu9250 *sensor, struct i2c *conn);
-int8_t mpu9250_ping(struct mpu9250 *sensor);
-int8_t mpu9250_set_gyro_scale(struct mpu9250 *sensor, int8_t scale);
-int8_t mpu9250_get_gyro_scale(struct mpu9250 *sensor);
-int8_t mpu9250_set_accel_scale(struct mpu9250 *sensor, int8_t scale);
-int8_t mpu9250_get_accel_scale(struct mpu9250 *sensor);
-int8_t mpu9250_set_accel_fchoice(struct mpu9250 *sensor, int8_t fchoice);
-int8_t mpu9250_get_accel_fchoice(struct mpu9250 *sensor);
-
+}  // end of imu namespace
+}  // end of piq namespace
 #endif

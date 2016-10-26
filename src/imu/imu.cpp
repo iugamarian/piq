@@ -22,5 +22,5 @@ IMU::IMU(void)
     this->roll = 0.0f;
 }
 
-}  // eof imu
-}  // eof piq
+}  // end of imu namespace
+}  // end of piq namespace

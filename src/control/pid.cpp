@@ -1,4 +1,4 @@
-#include "piq/controller/pid.hpp"
+#include "piq/control/pid.hpp"
 
 
 namespace piq {
@@ -53,5 +53,5 @@ double PID::calculate(double setpoint, double input, double dt)
     return output;
 }
 
-}  // eof control
-}  // eof piq
+}  // end of control namespace
+}  // end of piq namespace

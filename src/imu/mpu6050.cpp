@@ -538,5 +538,5 @@ int8_t MPU6050::record(char *output_path, int nb_samples)
     return 0;
 }
 
-}  // eof imu
-}  // eof piq
+}  // end of imu namespace
+}  // end of piq namespace

@@ -7,7 +7,7 @@ default: subdirs
 
 subdirs:
 	make -s -C comm
-	make -s -C controller
+	make -s -C control
 	make -s -C imu
 	# make -s -C motor
 
