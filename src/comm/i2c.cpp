@@ -86,6 +86,15 @@ int I2C::writeByte(char reg_addr, char byte)
     return 0;
 }
 
+int I2C::writeRawByte(char byte)
+{
+    if (write(this->fd, &byte, 1) != 1) {
+        return -1;
+    }
+
+    return 0;
+}
+
 int I2C::writeBytes(char reg_addr, char *data, size_t length)
 {
     int i;

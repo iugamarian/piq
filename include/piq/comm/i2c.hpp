@@ -36,6 +36,7 @@ public:
     int readBytes(char reg_addr, char *data, size_t length);
     int readByte(char reg_addr, char *data);
     int writeByte(char reg_addr, char byte);
+    int writeRawByte(char byte);
     int writeBytes(char reg_addr, char *data, size_t length);
 };
 

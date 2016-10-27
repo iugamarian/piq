@@ -4,8 +4,7 @@
 #include <math.h>
 #include <unistd.h>
 
-#include "piq/util.h"
-#include "piq/comm/i2c.h"
+#include "piq/comm/i2c.hpp"
 
 
 /* REGISTERS */
@@ -91,14 +90,21 @@
 #define PCA9685_WAIT_MS 5
 
 
-/* ERROR MESSAGES */
+namespace piq {
+namespace motor {
 
+class PCA9685
+{
+public:
+    comm::I2C i2c;
 
-/* FUNCTIONS */
-void pca9685_setup(int freq);
-void pca9685_set_pwm_frequency(int freq);
-void pca9685_set_pwm(int8_t channel, int16_t off);
-void pca9685_set_all_pwm(int16_t off);
-void pca9685_reset(void);
+    int8_t configure(int freq);
+    void setPWMFrequency(int freq);
+    void setPWM(int8_t channel, int16_t off);
+    void setAllPWM(int16_t off);
+    void reset(void);
+};
 
+}  // end of motor namespace
+}  // end of piq namespace
 #endif

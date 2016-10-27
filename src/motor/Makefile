@@ -4,5 +4,5 @@ OBJS = $(SRCS:.cpp=.o)
 
 default: $(OBJS)
 
-%.o: %.c
+%.o: %.cpp
 	$(MAKE_OBJ)
