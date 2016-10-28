@@ -4,12 +4,18 @@
 namespace piq {
 namespace imu {
 
+MPU6050::MPU6050(void)
+{
+
+}
+
 int8_t MPU6050::configure(void)
 {
     int8_t retval;
 
     /* setup */
     this->i2c = comm::I2C();
+    this->i2c.setup();
     this->i2c.setSlave(MPU6050_ADDRESS);
 
     /* set intial values */
@@ -90,13 +96,12 @@ int8_t MPU6050::configure(void)
 
 int8_t MPU6050::ping(void)
 {
-    char buf[1];
+    char buf;
 
     /* print mpu6050 address */
-    buf[0] = 0x00;
     this->i2c.setSlave(MPU6050_ADDRESS);
-    this->i2c.readBytes(MPU6050_RA_WHO_AM_I, buf, 1);
-    printf("MPU6050 ADDRESS: 0x%02X\n", buf[0]);
+    this->i2c.readByte(MPU6050_RA_WHO_AM_I, &buf);
+    printf("MPU6050 ADDRESS: 0x%02X\n", buf);
 
     return 0;
 }

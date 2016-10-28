@@ -6,6 +6,9 @@
 #include "piq/comm/i2c.hpp"
 
 
+namespace piq {
+namespace imu {
+
 /* GENERAL */
 #define MPU6050_ADDRESS                 0x68
 #define MPU6050_ADDRESS_AD0_LOW         0x68  // addr pin low (GND) [default]
@@ -123,9 +126,6 @@
 #define MPU6050_RA_FIFO_R_W             0x74
 #define MPU6050_RA_WHO_AM_I             0x75
 
-
-namespace piq {
-namespace imu {
 
 class MPU6050Gyroscope
 {

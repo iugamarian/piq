@@ -4,6 +4,9 @@
 #include "piq/comm/i2c.hpp"
 
 
+namespace piq {
+namespace imu {
+
 /* GENERAL */
 #define MPU9250_ADDRESS                 0x68
 #define MPU9250_ADDRESS_AD0_LOW         0x68  // addr pin low (GND) [default]
@@ -111,9 +114,6 @@
 #define MPU9250_ZA_OFFSET_H 0x7D
 #define MPU9250_ZA_OFFSET_L 0x7E
 
-
-namespace piq {
-namespace imu {
 
 class MPU9250Gyroscope
 {

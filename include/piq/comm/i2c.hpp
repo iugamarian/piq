@@ -14,15 +14,15 @@
 #include "piq/util.h"
 
 
+namespace piq {
+namespace comm {
+
 // ERROR MESSAGES
 #define I2C_INIT_FAILED "failed to initialize I2C!"
 
 // DEFINES
 #define I2C_BUF_MAX 1024
 
-
-namespace piq {
-namespace comm {
 
 class I2C
 {

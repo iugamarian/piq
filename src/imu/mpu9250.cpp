@@ -4,6 +4,11 @@
 namespace piq {
 namespace imu {
 
+MPU9250::MPU9250(void)
+{
+
+}
+
 int MPU9250::configure(void)
 {
     /* setup */

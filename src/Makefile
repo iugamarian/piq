@@ -3,7 +3,7 @@ SRCS = $(filter-out piq.cpp, $(wildcard *.cpp))
 OBJS = $(SRCS:.cpp=.o)
 
 # default: subdirs libpiq piq
-default: subdirs
+default: subdirs libpiq
 
 subdirs:
 	make -s -C comm
@@ -11,7 +11,7 @@ subdirs:
 	make -s -C imu
 	make -s -C motor
 
-%.o: %.c
+%.o: %.cpp
 	$(MAKE_OBJ)
 
 libpiq: $(OBJS)

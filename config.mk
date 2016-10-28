@@ -16,7 +16,8 @@ LIBS = -L/usr/local/lib \
 	   -L/usr/lib \
 	   -L$(LIB_DIR) \
 	   -lm \
-	   -lpthread
+	   -lpthread \
+	   -lpiq
 
 
 # COMPILER FLAGS
@@ -45,5 +46,5 @@ MAKE_STATIC_LIB = \
 
 MAKE_TEST = \
 	echo "TEST [$@]"; \
-	$(CXX) $(CFLAGS) -c $@.c -o $(OBJ_DIR)/$@.o; \
+	$(CXX) $(CXXFLAGS) -c $@.cpp -o $(OBJ_DIR)/$@.o; \
 	$(CXX) $(OBJ_DIR)/$@.o -o $(BIN_DIR)/$@ $(LIBS);

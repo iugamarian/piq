@@ -7,6 +7,9 @@
 #include "piq/comm/i2c.hpp"
 
 
+namespace piq {
+namespace comm {
+
 /* REGISTERS */
 #define PCA9685_MODE1 0x00
 #define PCA9685_MODE2 0x01
@@ -89,9 +92,6 @@
 #define PCA9685_I2C_ADDR 0x40
 #define PCA9685_WAIT_MS 5
 
-
-namespace piq {
-namespace comm {
 
 class PCA9685
 {

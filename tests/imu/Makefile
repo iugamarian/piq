@@ -1,9 +1,8 @@
 include $(PWD)/config.mk
+SRCS = $(wildcard *.cpp)
+TESTS = $(SRCS:.cpp=)
 
-SRCS = $(wildcard *.c)
-TESTS = $(SRCS:.c=)
+default: $(TESTS)
 
-default: $(TESTS) 
-
-%: %.c
+%: %.cpp
 	$(MAKE_TEST)
