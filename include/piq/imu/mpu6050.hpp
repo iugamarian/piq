@@ -3,6 +3,8 @@
 
 #include <time.h>
 
+#include <iostream>
+
 #include "piq/comm/i2c.hpp"
 
 
@@ -207,7 +209,7 @@ public:
     void info(void);
     void recordHeader(FILE *output_file);
     void recordData(FILE *output_file);
-    int8_t record(char *output_path, int nb_samples);
+    int8_t record(std::string output_path, int nb_samples);
 };
 
 }  // eof imu

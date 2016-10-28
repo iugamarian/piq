@@ -510,14 +510,14 @@ void MPU6050::recordData(FILE *output_file)
     fprintf(output_file, "%f\n", this->roll);
 }
 
-int8_t MPU6050::record(char *output_path, int nb_samples)
+int8_t MPU6050::record(std::string output_path, int nb_samples)
 {
     int i;
     int8_t retval;
     FILE *output_file;
 
     /* setup */
-    output_file = fopen(output_path, "w");
+    output_file = fopen(output_path.c_str(), "w");
     this->recordHeader(output_file);
 
     /* record */
