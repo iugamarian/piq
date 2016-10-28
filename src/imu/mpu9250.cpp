@@ -4,7 +4,7 @@
 namespace piq {
 namespace imu {
 
-int8_t MPU9250::configure(void)
+int MPU9250::configure(void)
 {
     /* setup */
     this->i2c = comm::I2C();
@@ -31,7 +31,7 @@ int8_t MPU9250::configure(void)
     return 0;
 }
 
-int8_t MPU9250::ping(void)
+int MPU9250::ping(void)
 {
     char data;
 
@@ -43,7 +43,7 @@ int8_t MPU9250::ping(void)
     return data;
 }
 
-int8_t MPU9250::setGyroScale(int8_t scale)
+int MPU9250::setGyroScale(int8_t scale)
 {
     char data;
     uint8_t retval;
@@ -64,7 +64,7 @@ int8_t MPU9250::setGyroScale(int8_t scale)
     return 0;
 }
 
-int8_t MPU9250::getGyroScale(void)
+int MPU9250::getGyroScale(void)
 {
     char data;
     uint8_t retval;
@@ -83,7 +83,7 @@ int8_t MPU9250::getGyroScale(void)
     return data;
 }
 
-int8_t MPU9250::setAccelScale(int8_t scale)
+int MPU9250::setAccelScale(int8_t scale)
 {
     char data;
     uint8_t retval;
@@ -104,7 +104,7 @@ int8_t MPU9250::setAccelScale(int8_t scale)
     return 0;
 }
 
-int8_t MPU9250::getAccelScale(void)
+int MPU9250::getAccelScale(void)
 {
     char data;
     uint8_t retval;
@@ -123,7 +123,7 @@ int8_t MPU9250::getAccelScale(void)
     return data;
 }
 
-int8_t MPU9250::setAccelFchoice(int8_t fchoice)
+int MPU9250::setAccelFchoice(int8_t fchoice)
 {
     char data;
     uint8_t retval;
@@ -139,7 +139,7 @@ int8_t MPU9250::setAccelFchoice(int8_t fchoice)
     return 0;
 }
 
-int8_t MPU9250::getAccelFchoice(void)
+int MPU9250::getAccelFchoice(void)
 {
     char data;
     uint8_t retval;

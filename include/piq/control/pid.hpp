@@ -11,6 +11,7 @@ namespace control {
 
 class PID
 {
+public:
     double error_prev;
     double error_sum;
 
@@ -27,6 +28,6 @@ class PID
     double calculate(double setpoint, double input, double dt);
 };
 
-}  // eof comm
-}  // eof piq
+}  // end of control namespace
+}  // end of piq namespace
 #endif

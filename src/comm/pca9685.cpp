@@ -1,10 +1,10 @@
-#include "piq/motor/pca9685.hpp"
+#include "piq/comm/pca9685.hpp"
 
 
 namespace piq {
-namespace motor {
+namespace comm {
 
-int8_t PCA9685::configure(int freq)
+int PCA9685::configure(int freq)
 {
     char mode_1;
 

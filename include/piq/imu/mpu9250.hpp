@@ -196,14 +196,14 @@ public:
     float sample_rate;
 
     MPU9250(void);
-    int8_t configure(void);
-    int8_t ping(void);
-    int8_t setGyroScale(int8_t scale);
-    int8_t getGyroScale(void);
-    int8_t setAccelScale(int8_t scale);
-    int8_t getAccelScale(void);
-    int8_t setAccelFchoice(int8_t fchoice);
-    int8_t getAccelFchoice(void);
+    int configure(void);
+    int ping(void);
+    int setGyroScale(int8_t scale);
+    int getGyroScale(void);
+    int setAccelScale(int8_t scale);
+    int getAccelScale(void);
+    int setAccelFchoice(int8_t fchoice);
+    int getAccelFchoice(void);
 };
 
 }  // end of imu namespace
