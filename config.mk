@@ -11,7 +11,11 @@ LIB_DIR = $(BUILD_PATH)/lib
 
 
 # INCLUDE AND LIBRARY PATHS
-INCLUDES = -I$(PWD)/include -I/usr/local/include/
+INCLUDES = -I/usr/include \
+		   -I/usr/local/include/ \
+		   -I/usr/include/eigen3 \
+		   -I$(PWD)/include \
+
 LIBS = -L/usr/local/lib \
 	   -L/usr/lib \
 	   -L$(LIB_DIR) \

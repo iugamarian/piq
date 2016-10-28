@@ -71,6 +71,8 @@ struct terminal_settings
 
 
 /* FUNCTIONS */
+double deg2rad(double d);
+double rad2deg(double r);
 struct terminal_settings terminal_settings_new(void);
 void terminal_cooked_mode(struct terminal_settings *ts);
 void terminal_raw_mode(struct terminal_settings *ts);

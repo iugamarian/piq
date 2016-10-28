@@ -4,6 +4,11 @@
 namespace piq {
 namespace comm {
 
+PCA9685::PCA9685(void)
+{
+
+}
+
 int PCA9685::configure(int freq)
 {
     char mode_1;

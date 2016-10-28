@@ -1,5 +1,5 @@
-#ifndef __I2C_HPP__
-#define __I2C_HPP__
+#ifndef __PIQ_I2C_HPP__
+#define __PIQ_I2C_HPP__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +11,7 @@
 
 #include <linux/i2c-dev.h>
 
-#include "piq/util.h"
+#include "piq/util.hpp"
 
 
 namespace piq {

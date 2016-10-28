@@ -1,5 +1,15 @@
-#include "piq/util.h"
+#include "piq/util.hpp"
 
+
+double deg2rad(double d)
+{
+    return d * (M_PI / 180);
+}
+
+double rad2deg(double r)
+{
+    return r * (180 / M_PI);
+}
 
 struct terminal_settings terminal_settings_new(void)
 {

@@ -1,5 +1,5 @@
-#ifndef __PCA9685_HPP__
-#define __PCA9685_HPP__
+#ifndef __PIQ_PCA9685_HPP__
+#define __PIQ_PCA9685_HPP__
 
 #include <math.h>
 #include <unistd.h>
@@ -98,6 +98,7 @@ class PCA9685
 public:
     comm::I2C i2c;
 
+    PCA9685(void);
     int configure(int freq);
     void setPWMFrequency(int freq);
     void setPWM(int8_t channel, int16_t off);

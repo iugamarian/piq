@@ -1,5 +1,5 @@
-#ifndef __MPU6050_HPP__
-#define __MPU6050_HPP__
+#ifndef __PIQ_MPU6050_HPP__
+#define __PIQ_MPU6050_HPP__
 
 #include <time.h>
 

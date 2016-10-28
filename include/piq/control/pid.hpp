@@ -1,5 +1,5 @@
-#ifndef __PID_HPP__
-#define __PID_HPP__
+#ifndef __PIQ_PID_HPP__
+#define __PIQ_PID_HPP__
 
 #include <stdlib.h>
 #include <math.h>

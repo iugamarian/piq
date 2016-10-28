@@ -1,5 +1,5 @@
-#ifndef __MOTOR_CONTROLLER_HPP__
-#define __MOTOR_CONTROLLER_HPP__
+#ifndef __PIQ_MOTOR_CONTROLLER_HPP__
+#define __PIQ_MOTOR_CONTROLLER_HPP__
 
 #include <stdint.h>
 
