@@ -319,13 +319,11 @@ int8_t MPU6050::getDPLFConfig(void)
 
 int8_t MPU6050::setSampleRateDiv(int8_t div)
 {
-    char data[1];
     int retval;
 
     /* set sample rate divider */
-    data[0] = div;
     this->i2c.setSlave(MPU6050_ADDRESS);
-    retval = this->i2c.writeBytes(MPU6050_RA_SMPLRT_DIV, data, 1);
+    retval = this->i2c.writeByte(MPU6050_RA_SMPLRT_DIV, div);
     if (retval != 0) {
         return -1;
     }
@@ -335,18 +333,17 @@ int8_t MPU6050::setSampleRateDiv(int8_t div)
 
 int8_t MPU6050::getSampleRateDiv(void)
 {
-    char data[1];
+    char data;
     int retval;
 
     /* get sample rate */
-    data[0] = 0x00;
     this->i2c.setSlave(MPU6050_ADDRESS);
-    retval = this->i2c.readBytes(MPU6050_RA_SMPLRT_DIV, data, 1);
+    retval = this->i2c.readByte(MPU6050_RA_SMPLRT_DIV, &data);
     if (retval != 0) {
         return -1;
     }
 
-    return data[0];
+    return data;
 }
 
 int16_t MPU6050::getSampleRate(void)
@@ -530,7 +527,7 @@ int8_t MPU6050::record(std::string output_path, int nb_samples)
         }
 
         /* record data */
-        this->recordHeader(output_file);
+        this->recordData(output_file);
         if (retval == -1) {
             log_err("failed to record MPU6050 data!");
             return -1;

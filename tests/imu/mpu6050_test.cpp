@@ -117,6 +117,7 @@ int testMPU6050SetAndGetSampleRateDiv(void)
     sensor.configure();
     sensor.setSampleRateDiv(1);
     rate_div = sensor.getSampleRateDiv();
+    mu_print("rate_div: %d\n", rate_div);
     mu_check(rate_div == 1);
 
     return 0;
